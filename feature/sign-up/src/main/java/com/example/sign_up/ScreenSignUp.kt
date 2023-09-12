@@ -1,7 +1,6 @@
-package com.example.sing_in
+package com.example.sign_up
 
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,14 +16,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardBackspace
+import androidx.compose.material.icons.outlined.KeyboardBackspace
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
@@ -33,24 +32,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.core.ui.theme.AnimeViewAppTheme
 import com.example.core.ui.theme.ThemeBox
 
 @Composable
-fun ScreenSignIn(
-    onClickRegistry: () -> Unit,
-    onClickForgetPassword: () -> Unit,
-    onClickSingIn: () -> Unit
-) {
+fun ScreenSignUp(onClickBack: () -> Unit = {}, onClickRegistry: () -> Unit = {}) {
     Box(
         Modifier
             .fillMaxSize()
@@ -62,17 +54,27 @@ fun ScreenSignIn(
         Column(
             Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(0.9f),
-            verticalArrangement = Arrangement.SpaceEvenly
+                .fillMaxWidth(0.9f)
+                .padding(top = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.Top)
         ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "",
+                modifier = Modifier
+                    .size(30.dp)
+                    .clickable {
+                        onClickBack()
+                    }
+            )
             Column {
                 Text(
-                    text = "Добро пожаловать",
+                    text = "Регистрация",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "Войдите в свою учетную запись",
+                    text = "Создайте учетную запись ",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -99,16 +101,43 @@ fun ScreenSignIn(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     decorationBox = {
                         ThemeBox {
-                            Box {
-                                if (email.value.isBlank()) {
-                                    Text(
-                                        text = "Электронная почта",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.tertiary
-                                    )
-                                }
-                                it()
+                            if (password.value.isBlank()) {
+                                Text(
+                                    text = "Электронная почта",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.tertiary
+                                )
                             }
+                            it()
+                        }
+                    },
+
+                    )
+            }
+            Column {
+                Text(
+                    text = "Email",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                BasicTextField(
+                    value = email.value,
+                    onValueChange = {
+                        email.value = it
+                    },
+                    singleLine = true,
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    decorationBox = {
+                        ThemeBox {
+                            if (password.value.isBlank()) {
+                                Text(
+                                    text = "Email",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.tertiary
+                                )
+                            }
+                            it()
                         }
                     },
 
@@ -140,21 +169,20 @@ fun ScreenSignIn(
                     decorationBox = {
 
                         ThemeBox {
-                            Box {
-                                if (password.value.isBlank()) {
-                                    Text(
-                                        text = "Пароль",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.tertiary
-                                    )
-                                }
-                                it()
+                            if (password.value.isBlank()) {
+                                Text(
+                                    text = "Пароль",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.tertiary
+                                )
                             }
                             val icon = if (isVisible.value) {
                                 Icons.Outlined.VisibilityOff
                             } else {
                                 Icons.Outlined.Visibility
                             }
+
+                            it()
                             Icon(
                                 imageVector = icon,
                                 contentDescription = "",
@@ -169,19 +197,11 @@ fun ScreenSignIn(
 
                     }
                 )
-                Text(
-                    text = "Забыли пароль?",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.align(Alignment.End).clickable {
-                        onClickForgetPassword()
-                    }
-                )
             }
 
             Button(
                 onClick = {
-                    onClickSingIn()
+
                 },
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.extraSmall)
@@ -190,104 +210,28 @@ fun ScreenSignIn(
                 shape = MaterialTheme.shapes.medium
             ) {
                 Text(
-                    text = "Авторизоваться",
+                    text = "Регистрация",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primaryContainer,
-
-                    )
+                    modifier = Modifier.clickable {
+                        onClickRegistry()
+                    }
+                )
             }
             Row(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 Text(
-                    text = "У вас нет учетной записи?",
+                    text = "У вас уже есть учетная запись?",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
                 Text(
-                    text = "Регистрироваться",
+                    text = "Войти",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable { 
-                        onClickRegistry()
-                    }
                 )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                Divider(modifier = Modifier.weight(1f), thickness = 1.dp)
-                Text(
-                    text = "Или",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp)
-                        .align(Alignment.CenterVertically),
-                    textAlign = TextAlign.Center
-                )
-                Divider(modifier = Modifier.weight(1f), thickness = 1.dp)
-            }
-            OutlinedButton(
-                onClick = {
-
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                shape = MaterialTheme.shapes.extraSmall,
-                border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.tertiary),
-            ) {
-
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_google),
-                    contentDescription = null,
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(35.dp)
-                )
-                Text(
-                    text = "Войти с помощью Google",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp)
-                        .align(Alignment.CenterVertically),
-                    textAlign = TextAlign.Center
-                )
-
-            }
-            OutlinedButton(
-                onClick = {
-
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                shape = MaterialTheme.shapes.extraSmall,
-                border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.tertiary),
-            ) {
-
-                Icon(
-                    imageVector = Icons.Outlined.Person,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.size(35.dp)
-                )
-                Text(
-                    text = "Вход без аккаунта",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 4.dp)
-                        .align(Alignment.CenterVertically),
-                    textAlign = TextAlign.Center
-                )
-
             }
         }
     }
@@ -297,14 +241,8 @@ fun ScreenSignIn(
     showBackground = true, backgroundColor = 0xFFFFFFFF, showSystemUi = true,
 )
 @Composable
-fun PreviewScreenSignIn() {
+fun PreviewScreenSignUp() {
     AnimeViewAppTheme {
-        ScreenSignIn(onClickRegistry = {
-
-        }, onClickForgetPassword = {
-
-        }) {
-
-        }
+        ScreenSignUp()
     }
 }
