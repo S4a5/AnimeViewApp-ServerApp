@@ -31,13 +31,18 @@ private val LightColorText = Color(0xFF1E1E1E)
 
 fun typography(darkTheme: Boolean): Typography {
     return Typography(
-        titleMedium = TextStyle(
+        titleLarge = TextStyle(
             fontSize = 24.sp,
             fontFamily = NexaFont,
             fontWeight = FontWeight.Bold,
         ),
+        titleMedium = TextStyle(
+            fontSize = 18.sp,
+            fontFamily = NexaFont,
+            fontWeight = FontWeight.Bold,
+        ),
         titleSmall = TextStyle(
-            fontSize = 16.sp,
+            fontSize = 14.sp,
             fontFamily = NexaFont,
             fontWeight = FontWeight.Bold,
         ),

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 private val LightColorScheme = lightColorScheme(
     primary = Main_Orange,
     secondary = Gray_1,
+    tertiary = Gray_2,
     background = White,
     secondaryContainer = Border_Pink,
     primaryContainer = White,
@@ -22,6 +23,7 @@ private val LightColorScheme = lightColorScheme(
 private val DarkColorScheme = darkColorScheme(
     primary = Main_Orange,
     secondary = Gray_1,
+    tertiary = Gray_2,
     background = Black,
     secondaryContainer = Border_Pink,
     primaryContainer = White,
@@ -41,10 +43,10 @@ fun AnimeViewAppTheme(
         colorScheme = colors,
         typography = typography(darkTheme),
         shapes = Shapes(
-            extraSmall = RoundedCornerShape(10.dp),
-            small = RoundedCornerShape(10.dp),
+            extraSmall = RoundedCornerShape(3.dp),
+            small = RoundedCornerShape(7.dp),
             medium = RoundedCornerShape(10.dp),
-            large = RoundedCornerShape(10.dp),
+            large = RoundedCornerShape(20.dp),
             extraLarge = RoundedCornerShape(10.dp),
         ),
         content = content

@@ -24,10 +24,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
@@ -39,16 +46,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.core.ui.theme.AnimeViewAppTheme
+import com.example.core.ui.theme.ThemeBox
+import java.sql.Driver
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenSignIn() {
     Box(
@@ -63,18 +75,17 @@ fun ScreenSignIn() {
             Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(0.9f),
-            verticalArrangement = Arrangement.spacedBy(30.dp)
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            Column(Modifier.padding(top = 20.dp)) {
+            Column {
                 Text(
                     text = "Добро пожаловать",
-                    modifier = Modifier.padding(top = 10.dp),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
                     text = "Войдите в свою учетную запись",
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
@@ -87,33 +98,36 @@ fun ScreenSignIn() {
             Column {
                 Text(
                     text = "Электронная почта",
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                OutlinedTextField(
+                BasicTextField(
                     value = email.value,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    textStyle = MaterialTheme.typography.labelMedium,
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.secondaryContainer
-
-                    ),
                     onValueChange = {
                         email.value = it
                     },
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                )
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    decorationBox = {
+                        ThemeBox {
+                            if (password.value.isBlank()) {
+                                Text(
+                                    text = "Электронная почта",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.tertiary
+                                )
+                            }
+                            it()
+                        }
+                    },
+
+                    )
             }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
+            Column {
                 Text(
                     text = "Пароль",
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 val isVisible = remember {
@@ -121,41 +135,52 @@ fun ScreenSignIn() {
                 }
                 BasicTextField(
                     value = password.value,
-
                     onValueChange = {
                         password.value = it
                     },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     visualTransformation = if (isVisible.value) {
                         PasswordVisualTransformation()
                     } else {
                         VisualTransformation.None
                     },
+
                     decorationBox = {
 
-                        val icon = if (isVisible.value) {
-                            Icons.Default.VisibilityOff
-                        } else {
-                            Icons.Default.Visibility
+                        ThemeBox {
+                            if (password.value.isBlank()) {
+                                Text(
+                                    text = "Пароль",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.tertiary
+                                )
+                            }
+                            val icon = if (isVisible.value) {
+                                Icons.Outlined.VisibilityOff
+                            } else {
+                                Icons.Outlined.Visibility
+                            }
+
+                            it()
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .clickable {
+                                        isVisible.value = isVisible.value.not()
+                                    }
+                                    .size(25.dp),
+                                tint = MaterialTheme.colorScheme.tertiary
+                            )
                         }
 
-                        it()
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = "",
-                            modifier = Modifier
-                                .clickable {
-                                    isVisible.value = isVisible.value.not()
-                                }
-                                .size(25.dp),
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
                     }
                 )
                 Text(
-                    text = "забыли пароль?",
-                    style = MaterialTheme.typography.labelSmall,
+                    text = "Забыли пароль?",
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.align(Alignment.End)
                 )
@@ -166,10 +191,10 @@ fun ScreenSignIn() {
 
                 },
                 modifier = Modifier
-                    .clip(RoundedCornerShape(5.dp))
+                    .clip(MaterialTheme.shapes.extraSmall)
                     .fillMaxWidth()
                     .height(60.dp),
-                shape = RoundedCornerShape(10.dp)
+                shape = MaterialTheme.shapes.medium
             ) {
                 Text(
                     text = "Авторизоваться",
@@ -184,23 +209,92 @@ fun ScreenSignIn() {
             ) {
                 Text(
                     text = "У вас нет учетной записи?",
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onBackground,
-//                        modifier = Modifier.align(Alignment.End)
                 )
                 Text(
                     text = "Регистрироваться",
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
-//                        modifier = Modifier.align(Alignment.End)
                 )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Divider(modifier = Modifier.weight(1f), thickness = 1.dp)
+                Text(
+                    text = "Или",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp)
+                        .align(Alignment.CenterVertically),
+                    textAlign = TextAlign.Center
+                )
+                Divider(modifier = Modifier.weight(1f), thickness = 1.dp)
+            }
+            OutlinedButton(
+                onClick = {
+
+                },
+                modifier = Modifier.fillMaxWidth().height(60.dp),
+                shape = MaterialTheme.shapes.extraSmall,
+                border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.tertiary),
+            ) {
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_google),
+                        contentDescription = null,
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(35.dp)
+                    )
+                    Text(
+                        text = "Войти с помощью Google",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 4.dp)
+                            .align(Alignment.CenterVertically),
+                        textAlign = TextAlign.Center
+                    )
+
+            }
+            OutlinedButton(
+                onClick = {
+
+                },
+                modifier = Modifier.fillMaxWidth().height(60.dp),
+                shape = MaterialTheme.shapes.extraSmall,
+                border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.tertiary),
+            ) {
+
+                Icon(
+                    imageVector = Icons.Outlined.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(35.dp)
+                )
+                Text(
+                    text = "Вход без аккаунта",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp)
+                        .align(Alignment.CenterVertically),
+                    textAlign = TextAlign.Center
+                )
+
             }
         }
     }
 }
 
 @Preview(
-    showBackground = true, backgroundColor = 0xFFFFFFFF, showSystemUi = true,
+    showBackground = true, backgroundColor = 0xFFFFFFFF, showSystemUi = true
 )
 @Composable
 fun PreviewScreenSignIn() {
