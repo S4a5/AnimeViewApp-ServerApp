@@ -46,11 +46,7 @@ import com.example.core.ui.theme.AnimeViewAppTheme
 import com.example.core.ui.theme.ThemeBox
 
 @Composable
-fun ScreenSignForgetPassword(
-    onClickRegistry: () -> Unit,
-    onClickForgetPassword: () -> Unit,
-    onClickSingIn: () -> Unit
-) {
+fun ScreenSignForgetPassword() {
     Box(
         Modifier
             .fillMaxSize()
@@ -118,7 +114,7 @@ fun ScreenSignForgetPassword(
 
             Button(
                 onClick = {
-                    onClickSingIn()
+
                 },
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.extraSmall)
@@ -145,12 +141,6 @@ fun ScreenSignForgetPassword(
 @Composable
 fun PreviewScreenSignForgetPassword() {
     AnimeViewAppTheme {
-        ScreenSignForgetPassword(onClickRegistry = {
-
-        }, onClickForgetPassword = {
-
-        }) {
-
-        }
+        ScreenSignForgetPassword()
     }
 }

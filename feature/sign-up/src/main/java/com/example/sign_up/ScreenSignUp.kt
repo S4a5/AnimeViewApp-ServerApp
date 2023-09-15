@@ -38,11 +38,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.ui.theme.AnimeViewAppTheme
 import com.example.core.ui.theme.ThemeBox
+import com.example.sign_up.navigate.ViewModelSingUp
 
 @Composable
-fun ScreenSignUp(onClickBack: () -> Unit = {}, onClickRegistry: () -> Unit = {}) {
+fun ScreenSignUp(viewModel:ViewModelSingUp = hiltViewModel()) {
     Box(
         Modifier
             .fillMaxSize()
@@ -64,7 +66,7 @@ fun ScreenSignUp(onClickBack: () -> Unit = {}, onClickRegistry: () -> Unit = {})
                 modifier = Modifier
                     .size(30.dp)
                     .clickable {
-                        onClickBack()
+                        viewModel.onNavBack()
                     }
             )
             Column {
@@ -214,7 +216,7 @@ fun ScreenSignUp(onClickBack: () -> Unit = {}, onClickRegistry: () -> Unit = {})
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primaryContainer,
                     modifier = Modifier.clickable {
-                        onClickRegistry()
+
                     }
                 )
             }
@@ -231,6 +233,9 @@ fun ScreenSignUp(onClickBack: () -> Unit = {}, onClickRegistry: () -> Unit = {})
                     text = "Войти",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable {
+                        viewModel.onNavBack()
+                    }
                 )
             }
         }

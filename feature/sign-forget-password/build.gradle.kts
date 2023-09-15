@@ -1,17 +1,21 @@
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    id ("com.google.dagger.hilt.android")
+    id ("com.android.library")
+    id ("kotlin-android")
+    kotlin("kapt")
 }
 
 android {
     namespace = "com.example.sign_forget_password"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 27
         compileSdkPreview = "UpsideDownCake"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
+//        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -24,11 +28,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -44,6 +48,12 @@ val ktxVersion: String by project
 val runtimeKtxVersion: String by project
 val activityComposeVersion: String by project
 val composeBomVersion: String by project
+kapt {
+    correctErrorTypes = true
+}
+hilt{
+    enableAggregatingTask = true
+}
 dependencies {
 
     implementation("androidx.core:core-ktx:$ktxVersion")
@@ -62,9 +72,27 @@ dependencies {
 
 
     implementation(project(":core"))
+
+    //Hilt
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    implementation("androidx.hilt:hilt-work:1.0.0")
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
+    implementation("androidx.work:work-runtime-ktx:2.8.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+
+    // Lifecycle
+    val lifecycle_version = "2.6.0-alpha05"
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
+    implementation ("androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version")
+
+    //Preview
     val composeBom = platform("androidx.compose:compose-bom:2023.08.00")
     implementation(composeBom)
-
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }

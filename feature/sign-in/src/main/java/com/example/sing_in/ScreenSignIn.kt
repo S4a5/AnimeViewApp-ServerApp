@@ -42,15 +42,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.ui.theme.AnimeViewAppTheme
 import com.example.core.ui.theme.ThemeBox
 
 @Composable
-fun ScreenSignIn(
-    onClickRegistry: () -> Unit,
-    onClickForgetPassword: () -> Unit,
-    onClickSingIn: () -> Unit
-) {
+fun ScreenSignIn() {
+    val viewModel: ViewModelSingIn = hiltViewModel()
     Box(
         Modifier
             .fillMaxSize()
@@ -173,15 +171,17 @@ fun ScreenSignIn(
                     text = "Забыли пароль?",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.align(Alignment.End).clickable {
-                        onClickForgetPassword()
-                    }
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .clickable {
+                            viewModel.onToForgetPassword()
+                        }
                 )
             }
 
             Button(
                 onClick = {
-                    onClickSingIn()
+                    viewModel.onToHome()
                 },
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.extraSmall)
@@ -209,8 +209,8 @@ fun ScreenSignIn(
                     text = "Регистрироваться",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable { 
-                        onClickRegistry()
+                    modifier = Modifier.clickable {
+                        viewModel.onToRegister()
                     }
                 )
             }
@@ -233,7 +233,6 @@ fun ScreenSignIn(
             }
             OutlinedButton(
                 onClick = {
-
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -295,16 +294,12 @@ fun ScreenSignIn(
 
 @Preview(
     showBackground = true, backgroundColor = 0xFFFFFFFF, showSystemUi = true,
+    device = "id:pixel_4",
 )
 @Composable
 fun PreviewScreenSignIn() {
     AnimeViewAppTheme {
-        ScreenSignIn(onClickRegistry = {
+        ScreenSignIn()
 
-        }, onClickForgetPassword = {
-
-        }) {
-
-        }
     }
 }

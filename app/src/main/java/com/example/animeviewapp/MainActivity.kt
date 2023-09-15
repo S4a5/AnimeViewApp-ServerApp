@@ -10,55 +10,54 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.animeviewapp.glue.home.navigate.AdapterHomeRoute
+import com.example.animeviewapp.glue.sign_forget_password.navigate.AdapterSignForgetPasswordRoute
+import com.example.animeviewapp.glue.sign_in.navigate.AdapterSignInRoute
+import com.example.animeviewapp.glue.sign_up.navigate.AdapterSignUpRoute
+import com.example.core.RouteScreen
 import com.example.core.ui.theme.AnimeViewAppTheme
-import com.example.sign_up.ScreenSignUp
+import com.example.home.navigate.routeScreenHome
+import com.example.sign_forget_password.navigate.routeScreenSingForgetPassword
+import com.example.sign_up.navigate.routeScreenSingUp
 import com.example.sing_in.ScreenSignIn
+import com.example.sing_in.navigate.routeScreenSingIn
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
+class MainActivity @Inject constructor() : ComponentActivity() {
 
-class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var adapterSignInRoute: AdapterSignInRoute
+    @Inject
+    lateinit var adapterSignUpRoute: AdapterSignUpRoute
+    @Inject
+    lateinit var adapterSignForgetPasswordRoute: AdapterSignForgetPasswordRoute
+    @Inject
+    lateinit var adapterHomeRoute: AdapterHomeRoute
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AnimeViewAppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-
-                }
                 val navController = rememberNavController()
+                adapterSignInRoute.setNavControl(navController)
+                adapterSignUpRoute.setNavControl(navController)
+                adapterSignForgetPasswordRoute.setNavControl(navController)
+                adapterHomeRoute.setNavControl(navController)
                 NavHost(
                     navController = navController,
                     startDestination = RouteScreen.SignIn.route
                 ) {
-                    composable(RouteScreen.SignIn.route) {
-                        ScreenSignIn(onClickRegistry = {
-                            navController.navigate(RouteScreen.SignUp.route)
-                        }, onClickForgetPassword = {
-                            navController.navigate(RouteScreen.SignForgetPassword.route)
-                        }, onClickSingIn = {
+                    routeScreenSingIn(RouteScreen.SignIn.route)
 
-                        })
+                    routeScreenSingUp(RouteScreen.SignUp.route)
 
-                    }
-                    composable(RouteScreen.SignUp.route) {
-                        ScreenSignUp(onClickBack = {
-                            navController.navigate(RouteScreen.SignIn.route)
-                        }, onClickRegistry = {
+                    routeScreenSingForgetPassword(RouteScreen.SignForgetPassword.route)
 
-                        })
-                    }
-                    composable(RouteScreen.SignForgetPassword.route) {
-
-                    }
+                    routeScreenHome(RouteScreen.SignHome.route)
                 }
             }
         }
     }
 }
 
-sealed class RouteScreen(val route: String) {
-    object SignIn : RouteScreen("sign_in")
-    object SignUp : RouteScreen("sign_up")
-    object SignForgetPassword : RouteScreen("sign_forget_password")
-}
