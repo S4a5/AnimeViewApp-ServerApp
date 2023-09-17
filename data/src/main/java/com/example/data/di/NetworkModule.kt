@@ -1,6 +1,7 @@
 package com.example.data.di
 
-import com.example.data.MyApiService
+import com.example.data.AnilibriaService
+import com.example.data.AnimeVostService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -8,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -22,9 +24,20 @@ object AnimeVostModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @Named("AnimeVost")
+    fun provideRetrofitAnimeVost( okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.animevost.org/v1/") // Замените на ваш URL
+            .baseUrl("https://api.animevost.org/v1/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+    @Provides
+    @Singleton
+    @Named("Anilibria")
+    fun provideRetrofitAnilibria( okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.anilibria.tv/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -32,7 +45,12 @@ object AnimeVostModule {
 
     @Provides
     @Singleton
-    fun provideMyApiService(retrofit: Retrofit): MyApiService {
-        return retrofit.create(MyApiService::class.java)
+    fun provideAnimeVostService(@Named("AnimeVost") retrofit: Retrofit): AnimeVostService {
+        return retrofit.create(AnimeVostService::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideAnilibriaService(@Named("Anilibria") retrofit: Retrofit): AnilibriaService {
+        return retrofit.create(AnilibriaService::class.java)
     }
 }

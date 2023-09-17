@@ -83,15 +83,10 @@ dependencies {
     implementation(project(mapOf("path" to ":feature:sign-forget-password")))
     implementation(project(mapOf("path" to ":feature:home")))
     debugImplementation("androidx.compose.ui:ui-tooling")
-
     implementation(project(":core"))
-
-
 
     //Navigation
     implementation("androidx.navigation:navigation-compose:$navVersion")
-
-
 
     //Hilt
     implementation("com.google.dagger:hilt-android:2.44")
@@ -121,6 +116,10 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
+    implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
 
 
 }
