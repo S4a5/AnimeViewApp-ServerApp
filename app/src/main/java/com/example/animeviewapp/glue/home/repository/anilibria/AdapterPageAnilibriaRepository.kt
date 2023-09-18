@@ -9,8 +9,8 @@ import javax.inject.Inject
 
 class AdapterPageAnilibriaRepository @Inject constructor(private val anilibriaService: AnilibriaService) :
     PageAnilibriaRepository {
-    override suspend fun getPageAnime(): Response<AnilibriaModel> {
-        return anilibriaService.getChanges()
+    override suspend fun getPageAnime(  page: Int): Response<AnilibriaModel> {
+        return anilibriaService.getChanges(page)
     }
 
 

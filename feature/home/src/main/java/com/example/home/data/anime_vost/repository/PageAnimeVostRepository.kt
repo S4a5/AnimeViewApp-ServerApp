@@ -6,6 +6,6 @@ import retrofit2.Response
 interface PageAnimeVostRepository {
     suspend fun getPageAnime(
         page: Int,
-        quantity: Int = 30
+        quantity: Int = 5
     ): Response<AnimeVostModel>
 }

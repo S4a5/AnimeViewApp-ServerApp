@@ -12,7 +12,7 @@ interface AnimeVostService {
     @GET("last")
     suspend fun getPageAnime(
         @Query("page") page: Int,
-        @Query("quantity") quantity: Int = 30
+        @Query("quantity") quantity: Int = 5
     ): Response<AnimeVostModel>
 
     @POST("/playlist")

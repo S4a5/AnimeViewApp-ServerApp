@@ -5,7 +5,9 @@ import com.example.core.model.anilibria.getChanges.AnimeTitle
 import retrofit2.Response
 
 interface PageAnilibriaRepository {
-    suspend fun getPageAnime(): Response<AnilibriaModel>
+    suspend fun getPageAnime(
+        page: Int,
+    ): Response<AnilibriaModel>
 
 
 }
