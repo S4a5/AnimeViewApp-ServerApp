@@ -1,30 +1,25 @@
 package com.example.home
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.model.AnimeDetails
 import com.example.core.model.ItemAnimeModel
 import com.example.core.model.StateUi
-import com.example.core.model.anilibria.getChanges.AnilibriaModel
-import com.example.core.model.anilibria.getChanges.AnimeTitle
-import com.example.core.model.anime_vost.AnimeVostModel
-import com.example.home.data.anime_vost.GetGenreUseCase
-import com.example.home.data.anime_vost.GetPageFromAnimeVostUseCase
+import com.example.home.data.anime_vost.GetPageAnimeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.Exception
 
 @HiltViewModel
-class ViewModelHome @Inject constructor(private val getPageFromAnimeVostUseCase: GetPageFromAnimeVostUseCase,private val getGenreUseCase: GetGenreUseCase) :
+class ViewModelHome @Inject constructor(private val getPageFromAnimeVostUseCase: GetPageAnimeUseCase) :
     ViewModel() {
 
-    private val _list = MutableStateFlow<StateUi<SnapshotStateList<ItemAnimeModel>>>(StateUi.Loader)
+    private val _list = MutableStateFlow<StateUi<SnapshotStateList<AnimeDetails>>>(StateUi.Loader)
     val list = _list.asStateFlow()
 
     private val _progressNewAnime = MutableStateFlow<StateUi<Nothing>>(StateUi.Loader)
@@ -39,7 +34,7 @@ class ViewModelHome @Inject constructor(private val getPageFromAnimeVostUseCase:
     init {
         viewModelScope.launch {
             getData()
-            getGenre()
+//            getGenre()
         }
     }
     fun onClickGenre(key: String) {
@@ -50,40 +45,40 @@ class ViewModelHome @Inject constructor(private val getPageFromAnimeVostUseCase:
 
     private suspend fun getData() {
         try {
-            val response = getPageFromAnimeVostUseCase.execute()
+            val response = getPageFromAnimeVostUseCase.nextPage()
             _list.emit(StateUi.Success(response))
         } catch (e: Exception) {
-
+            _list.emit(StateUi.Failed(e.message.toString()))
         }
     }
 
-    private suspend fun getGenre() {
-        try {
-            _genre.emit(StateUi.Loader)
-            val response = getGenreUseCase.execute()
-            if (response.isSuccessful) {
-                _genre.emit(StateUi.Success(data = response.body()))
-            } else {
-                if (response.errorBody() != null) {
-                    _genre.emit(StateUi.Failed(response.errorBody().toString()))
-                } else {
-                    _genre.emit(StateUi.Failed(null))
-                }
-            }
-        } catch (e: Exception) {
-            _genre.emit(StateUi.Failed(e.message))
-        }
-    }
+//    private suspend fun getGenre() {
+//        try {
+//            _genre.emit(StateUi.Loader)
+//            val response = getGenreUseCase.execute()
+//            if (response.isSuccessful) {
+//                _genre.emit(StateUi.Success(data = response.body()))
+//            } else {
+//                if (response.errorBody() != null) {
+//                    _genre.emit(StateUi.Failed(response.errorBody().toString()))
+//                } else {
+//                    _genre.emit(StateUi.Failed(null))
+//                }
+//            }
+//        } catch (e: Exception) {
+//            _genre.emit(StateUi.Failed(e.message))
+//        }
+//    }
 
     fun avtoLoadAnime() {
-        viewModelScope.launch {
-            if (_list.value is StateUi.Success){
-                _progressNewAnime.emit(StateUi.Loader)
-                val response = getPageFromAnimeVostUseCase.newPage()
-                _list.emit(StateUi.Success(response))
-                _progressNewAnime.emit(StateUi.Success())
-            }
-
-        }
+//        viewModelScope.launch {
+//            if (_list.value is StateUi.Success){
+//                _progressNewAnime.emit(StateUi.Loader)
+//                val response = getPageFromAnimeVostUseCase.nextPage()
+//                _list.emit(StateUi.Success(response))
+//                _progressNewAnime.emit(StateUi.Success())
+//            }
+//
+//        }
     }
 }

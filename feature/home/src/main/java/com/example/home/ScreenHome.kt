@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,14 +28,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,8 +40,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.ImageBitmapConfig
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -56,7 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
-import com.example.core.model.ItemAnimeModel
+import com.example.core.model.AnimeDetails
 import com.example.core.model.StateUi
 import com.example.core.ui.theme.AnimeViewAppTheme
 import com.example.core.ui.theme.ThemeBox
@@ -74,7 +68,7 @@ fun ScreenHome(
     ) {
         Search()
 
-        RowGenre(viewModelHome)
+//        RowGenre(viewModelHome)
 
         Content(viewModelHome)
 
@@ -87,7 +81,9 @@ fun Content(viewModelHome: ViewModelHome) {
         val listAnime by viewModelHome.list.collectAsState()
         val progress by viewModelHome.progressNewAnime.collectAsState()
         when (val state = listAnime) {
-            is StateUi.Failed -> TODO()
+            is StateUi.Failed -> {
+                Log.d("qweqweqwe",state.error.toString())
+            }
             StateUi.Loader -> {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
@@ -127,19 +123,16 @@ fun Content(viewModelHome: ViewModelHome) {
                     }
 
                 }
-                LaunchedEffect(lazyState) {
-                    snapshotFlow { lazyState.layoutInfo }
-                        .collect {
-                            val lastVisibleItem =
-                                lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-                            Log.e("avtoLoadAnime", lastVisibleItem.toString())
-                            Log.e("avtoLoadAnime", lazyState.layoutInfo.totalItemsCount.toString())
-                            Log.e("avtoLoadAnime", "==========================")
-                            if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
-                                viewModelHome.avtoLoadAnime()
-                            }
-                        }
-                }
+//                LaunchedEffect(lazyState) {
+//                    snapshotFlow { lazyState.layoutInfo }
+//                        .collect {
+//                            val lastVisibleItem =
+//                                lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+//                            if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
+//                                viewModelHome.avtoLoadAnime()
+//                            }
+//                        }
+//                }
 
             }
         }
@@ -149,7 +142,11 @@ fun Content(viewModelHome: ViewModelHome) {
 }
 
 @Composable
-private fun Items(data: ItemAnimeModel) {
+private fun Items(data: AnimeDetails) {
+    val nameModels = data.nameModels.firstOrNull()?:return
+    val voiceModels = data.voiceModels.firstOrNull()?:return
+//    val seriesModels = data.seriesModels
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -158,7 +155,7 @@ private fun Items(data: ItemAnimeModel) {
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         SubcomposeAsyncImage(
-            model = data.previewImageUrl,
+            model = voiceModels.urlImagePreview,
             loading = {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             },
@@ -178,7 +175,7 @@ private fun Items(data: ItemAnimeModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val title = data.nameEng
+            val title = nameModels.ru!!
 
             Text(
                 text = title,
@@ -187,31 +184,40 @@ private fun Items(data: ItemAnimeModel) {
                 textAlign = TextAlign.Center,
             )
 
-            if (data.ordinal != null) {
-                val season = data.ordinal.toString()
-                Text(
-                    text = season,
-                    style = MaterialTheme.typography.labelMedium,
-                    textAlign = TextAlign.Center,
-                )
-            }
-            Text(
-                text = data.genre.joinToString(separator = ", "),
-                style = MaterialTheme.typography.labelMedium,
-                textAlign = TextAlign.Center,
-            )
+//            if (data.ordinal != null) {
+//                val season = data.ordinal.toString()
+//                Text(
+//                    text = season,
+//                    style = MaterialTheme.typography.labelMedium,
+//                    textAlign = TextAlign.Center,
+//                )
+//            }
+//            Text(
+//                text = data.genre.joinToString(separator = ", "),
+//                style = MaterialTheme.typography.labelMedium,
+//                textAlign = TextAlign.Center,
+//            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                for (model in data.voice) {
+                for (model in data.voiceModels) {
+                    if (model.voiceGrupe == "anime_vost"){
+                        Image(
+                            painter = painterResource(com.example.core.R.drawable.anime_vost),
+                            contentDescription = "",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    if (model.voiceGrupe == "anilibria"){
+                        Image(
+                            painter = painterResource(com.example.core.R.drawable.anilibria),
+                            contentDescription = "",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
 
-                    Image(
-                        painter = painterResource(id = model.image),
-                        contentDescription = "",
-                        modifier = Modifier.size(20.dp)
-                    )
                 }
             }
         }
