@@ -13,14 +13,23 @@ import androidx.compose.ui.unit.dp
 
 private val LightColorScheme = lightColorScheme(
     primary = Main_Orange,
+    onPrimary = White,
+    primaryContainer = Main_Orange,
+    onPrimaryContainer =  White,
+
     secondary = Gray_1,
-    tertiary = Gray_2,
     onSecondary = Gray_3,
-    background = White,
     secondaryContainer = Border_Pink,
-    primaryContainer = White,
+
+    tertiary = Gray_2,
+
+    background = White,
     onBackground = Black,
+
+    surface = White,
+    onSurface = Border_Pink
 )
+
 private val DarkColorScheme = darkColorScheme(
     primary = Main_Orange,
     secondary = Gray_1,

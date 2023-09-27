@@ -4,9 +4,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.core.model.AnimeDetails
-import com.example.core.model.ItemAnimeModel
 import com.example.core.model.StateUi
+import com.example.core.model.ktor.AnimeDetails
 import com.example.home.data.anime_vost.GetPageAnimeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
