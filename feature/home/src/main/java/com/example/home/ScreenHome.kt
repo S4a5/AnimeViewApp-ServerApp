@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,14 +28,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,8 +40,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.ImageBitmapConfig
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -56,8 +50,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
-import com.example.core.model.ItemAnimeModel
 import com.example.core.model.StateUi
+import com.example.core.model.ktor.AnimeDetails
 import com.example.core.ui.theme.AnimeViewAppTheme
 import com.example.core.ui.theme.ThemeBox
 
@@ -74,7 +68,7 @@ fun ScreenHome(
     ) {
         Search()
 
-        RowGenre(viewModelHome)
+//        RowGenre(viewModelHome)
 
         Content(viewModelHome)
 
@@ -87,7 +81,9 @@ fun Content(viewModelHome: ViewModelHome) {
         val listAnime by viewModelHome.list.collectAsState()
         val progress by viewModelHome.progressNewAnime.collectAsState()
         when (val state = listAnime) {
-            is StateUi.Failed -> TODO()
+            is StateUi.Failed -> {
+                Log.d("horizontalAlignment",state.error.toString())
+            }
             StateUi.Loader -> {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
@@ -113,33 +109,33 @@ fun Content(viewModelHome: ViewModelHome) {
                         Items(it)
                     }
 
-                    if (progress is StateUi.Loader) {
-                        item {
-
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .size(50.dp)
-                                        .fillMaxWidth(),
-                                    strokeWidth = 6.dp
-                                )
-
-                        }
-                    }
+//                    if (progress is StateUi.Loader) {
+//                        item {
+//
+//                                CircularProgressIndicator(
+//                                    modifier = Modifier
+//                                        .size(50.dp)
+//                                        .fillMaxWidth(),
+//                                    strokeWidth = 6.dp
+//                                )
+//
+//                        }
+//                    }
 
                 }
-                LaunchedEffect(lazyState) {
-                    snapshotFlow { lazyState.layoutInfo }
-                        .collect {
-                            val lastVisibleItem =
-                                lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-                            Log.e("avtoLoadAnime", lastVisibleItem.toString())
-                            Log.e("avtoLoadAnime", lazyState.layoutInfo.totalItemsCount.toString())
-                            Log.e("avtoLoadAnime", "==========================")
-                            if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
-                                viewModelHome.avtoLoadAnime()
-                            }
-                        }
-                }
+//                LaunchedEffect(lazyState) {
+//                    snapshotFlow { lazyState.layoutInfo }
+//                        .collect {
+//                            val lastVisibleItem =
+//                                lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+//                            Log.e("avtoLoadAnime", lastVisibleItem.toString())
+//                            Log.e("avtoLoadAnime", lazyState.layoutInfo.totalItemsCount.toString())
+//                            Log.e("avtoLoadAnime", "==========================")
+//                            if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
+//                                viewModelHome.avtoLoadAnime()
+//                            }
+//                        }
+//                }
 
             }
         }
@@ -149,7 +145,7 @@ fun Content(viewModelHome: ViewModelHome) {
 }
 
 @Composable
-private fun Items(data: ItemAnimeModel) {
+private fun Items(dataDetails: AnimeDetails) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -157,8 +153,11 @@ private fun Items(data: ItemAnimeModel) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
+        val body = dataDetails.voiceModels.first()
+        val name = dataDetails.nameModels.first()
+//        val series = dataDetails.seriesModels.first()
         SubcomposeAsyncImage(
-            model = data.previewImageUrl,
+            model = body.urlImagePreview,
             loading = {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             },
@@ -178,7 +177,7 @@ private fun Items(data: ItemAnimeModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val title = data.nameEng
+            val title = name.ru!!
 
             Text(
                 text = title,
@@ -187,16 +186,16 @@ private fun Items(data: ItemAnimeModel) {
                 textAlign = TextAlign.Center,
             )
 
-            if (data.ordinal != null) {
-                val season = data.ordinal.toString()
-                Text(
-                    text = season,
-                    style = MaterialTheme.typography.labelMedium,
-                    textAlign = TextAlign.Center,
-                )
-            }
+//            if (data.ordinal != null) {
+//                val season = data.ordinal.toString()
+//                Text(
+//                    text = season,
+//                    style = MaterialTheme.typography.labelMedium,
+//                    textAlign = TextAlign.Center,
+//                )
+//            }
             Text(
-                text = data.genre.joinToString(separator = ", "),
+                text = body.genre!!,
                 style = MaterialTheme.typography.labelMedium,
                 textAlign = TextAlign.Center,
             )
@@ -205,13 +204,23 @@ private fun Items(data: ItemAnimeModel) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                for (model in data.voice) {
+                for (model in dataDetails.voiceModels) {
+                    Log.d("horizontalAlignment",model.voiceGrupe)
+                    if (model.voiceGrupe == "anime_vost"){
+                        Image(
+                            painter = painterResource(id = com.example.core.R.drawable.anime_vost),
+                            contentDescription = "",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    if (model.voiceGrupe == "anilibria"){
+                        Image(
+                            painter = painterResource(id = com.example.core.R.drawable.anilibria),
+                            contentDescription = "",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
 
-                    Image(
-                        painter = painterResource(id = model.image),
-                        contentDescription = "",
-                        modifier = Modifier.size(20.dp)
-                    )
                 }
             }
         }

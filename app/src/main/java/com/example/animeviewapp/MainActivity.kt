@@ -4,22 +4,24 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.animeviewapp.bottom_bar.BottomNavigation
 import com.example.animeviewapp.glue.home.navigate.AdapterHomeRoute
 import com.example.animeviewapp.glue.sign_forget_password.navigate.AdapterSignForgetPasswordRoute
 import com.example.animeviewapp.glue.sign_in.navigate.AdapterSignInRoute
 import com.example.animeviewapp.glue.sign_up.navigate.AdapterSignUpRoute
-import com.example.core.RouteScreen
+import com.example.animeviewapp.model.RouteScreen
 import com.example.core.ui.theme.AnimeViewAppTheme
 import com.example.home.navigate.routeScreenHome
 import com.example.sign_forget_password.navigate.routeScreenSingForgetPassword
 import com.example.sign_up.navigate.routeScreenSingUp
-import com.example.sing_in.ScreenSignIn
 import com.example.sing_in.navigate.routeScreenSingIn
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -29,10 +31,13 @@ class MainActivity @Inject constructor() : ComponentActivity() {
 
     @Inject
     lateinit var adapterSignInRoute: AdapterSignInRoute
+
     @Inject
     lateinit var adapterSignUpRoute: AdapterSignUpRoute
+
     @Inject
     lateinit var adapterSignForgetPasswordRoute: AdapterSignForgetPasswordRoute
+
     @Inject
     lateinit var adapterHomeRoute: AdapterHomeRoute
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,20 +49,39 @@ class MainActivity @Inject constructor() : ComponentActivity() {
                 adapterSignUpRoute.setNavControl(navController)
                 adapterSignForgetPasswordRoute.setNavControl(navController)
                 adapterHomeRoute.setNavControl(navController)
-                NavHost(
-                    navController = navController,
-                    startDestination = RouteScreen.SignIn.route
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+
+                        BottomNavigation(
+                            navController = navController,
+                            list = listOf(RouteScreen.SignHome)
+                        )
+
+                    }
                 ) {
-                    routeScreenSingIn(RouteScreen.SignIn.route)
+                    NavHost(
+                        modifier = Modifier.padding(it),
+                        navController = navController,
+                        startDestination = RouteScreen.SignIn.route,
 
-                    routeScreenSingUp(RouteScreen.SignUp.route)
+                        ) {
+                        routeScreenSingIn(RouteScreen.SignIn.route)
 
-                    routeScreenSingForgetPassword(RouteScreen.SignForgetPassword.route)
+                        routeScreenSingUp(RouteScreen.SignUp.route)
 
-                    routeScreenHome(RouteScreen.SignHome.route)
+                        routeScreenSingForgetPassword(RouteScreen.SignForgetPassword.route)
+
+                        routeScreenHome(RouteScreen.SignHome.route)
+
+                    }
                 }
+
+
             }
         }
     }
 }
+
 

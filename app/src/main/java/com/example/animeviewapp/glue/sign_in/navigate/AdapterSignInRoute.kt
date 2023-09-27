@@ -2,8 +2,7 @@ package com.example.animeviewapp.glue.sign_in.navigate
 
 import android.util.Log
 import androidx.navigation.NavController
-import com.example.core.RouteScreen
-import com.example.sign_up.navigate.NavigateSignUpRoute
+import com.example.animeviewapp.model.RouteScreen
 import com.example.sing_in.navigate.NavigateSignInRoute
 import javax.inject.Inject
 import javax.inject.Singleton
