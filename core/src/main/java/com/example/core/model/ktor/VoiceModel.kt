@@ -7,7 +7,7 @@ data class VoiceModel(
     val voiceGrupe: String,
     val description: String?,
     val genre: String?,
-    val urlImagePreview: String?,
+    var urlImagePreview: String?,
     val screenImage: String?,
     val seriesCount: Int?,
     val last_change: Int?,

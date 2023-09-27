@@ -50,8 +50,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
+import com.example.core.model.AnimeDetails
 import com.example.core.model.StateUi
-import com.example.core.model.ktor.AnimeDetails
 import com.example.core.ui.theme.AnimeViewAppTheme
 import com.example.core.ui.theme.ThemeBox
 
@@ -82,7 +82,7 @@ fun Content(viewModelHome: ViewModelHome) {
         val progress by viewModelHome.progressNewAnime.collectAsState()
         when (val state = listAnime) {
             is StateUi.Failed -> {
-                Log.d("horizontalAlignment",state.error.toString())
+                Log.d("qweqweqwe",state.error.toString())
             }
             StateUi.Loader -> {
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -109,18 +109,18 @@ fun Content(viewModelHome: ViewModelHome) {
                         Items(it)
                     }
 
-//                    if (progress is StateUi.Loader) {
-//                        item {
-//
-//                                CircularProgressIndicator(
-//                                    modifier = Modifier
-//                                        .size(50.dp)
-//                                        .fillMaxWidth(),
-//                                    strokeWidth = 6.dp
-//                                )
-//
-//                        }
-//                    }
+                    if (progress is StateUi.Loader) {
+                        item {
+
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .fillMaxWidth(),
+                                    strokeWidth = 6.dp
+                                )
+
+                        }
+                    }
 
                 }
 //                LaunchedEffect(lazyState) {
@@ -128,9 +128,6 @@ fun Content(viewModelHome: ViewModelHome) {
 //                        .collect {
 //                            val lastVisibleItem =
 //                                lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-//                            Log.e("avtoLoadAnime", lastVisibleItem.toString())
-//                            Log.e("avtoLoadAnime", lazyState.layoutInfo.totalItemsCount.toString())
-//                            Log.e("avtoLoadAnime", "==========================")
 //                            if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
 //                                viewModelHome.avtoLoadAnime()
 //                            }
@@ -145,7 +142,11 @@ fun Content(viewModelHome: ViewModelHome) {
 }
 
 @Composable
-private fun Items(dataDetails: AnimeDetails) {
+private fun Items(data: AnimeDetails) {
+    val nameModels = data.nameModels.firstOrNull()?:return
+    val voiceModels = data.voiceModels.firstOrNull()?:return
+//    val seriesModels = data.seriesModels
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -153,11 +154,8 @@ private fun Items(dataDetails: AnimeDetails) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        val body = dataDetails.voiceModels.first()
-        val name = dataDetails.nameModels.first()
-//        val series = dataDetails.seriesModels.first()
         SubcomposeAsyncImage(
-            model = body.urlImagePreview,
+            model = voiceModels.urlImagePreview,
             loading = {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             },
@@ -177,7 +175,7 @@ private fun Items(dataDetails: AnimeDetails) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val title = name.ru!!
+            val title = nameModels.ru!!
 
             Text(
                 text = title,
@@ -194,28 +192,27 @@ private fun Items(dataDetails: AnimeDetails) {
 //                    textAlign = TextAlign.Center,
 //                )
 //            }
-            Text(
-                text = body.genre!!,
-                style = MaterialTheme.typography.labelMedium,
-                textAlign = TextAlign.Center,
-            )
+//            Text(
+//                text = data.genre.joinToString(separator = ", "),
+//                style = MaterialTheme.typography.labelMedium,
+//                textAlign = TextAlign.Center,
+//            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                for (model in dataDetails.voiceModels) {
-                    Log.d("horizontalAlignment",model.voiceGrupe)
+                for (model in data.voiceModels) {
                     if (model.voiceGrupe == "anime_vost"){
                         Image(
-                            painter = painterResource(id = com.example.core.R.drawable.anime_vost),
+                            painter = painterResource(com.example.core.R.drawable.anime_vost),
                             contentDescription = "",
                             modifier = Modifier.size(20.dp)
                         )
                     }
                     if (model.voiceGrupe == "anilibria"){
                         Image(
-                            painter = painterResource(id = com.example.core.R.drawable.anilibria),
+                            painter = painterResource(com.example.core.R.drawable.anilibria),
                             contentDescription = "",
                             modifier = Modifier.size(20.dp)
                         )

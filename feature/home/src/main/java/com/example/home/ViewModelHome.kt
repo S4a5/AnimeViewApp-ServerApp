@@ -1,15 +1,13 @@
 package com.example.home
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.model.AnimeDetails
 import com.example.core.model.ItemAnimeModel
 import com.example.core.model.StateUi
-import com.example.core.model.ktor.AnimeDetails
-import com.example.home.data.GetPageAnimeUseCase
+import com.example.home.data.anime_vost.GetPageAnimeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +16,7 @@ import javax.inject.Inject
 import kotlin.Exception
 
 @HiltViewModel
-class ViewModelHome @Inject constructor(private val getPageAnimeUseCase: GetPageAnimeUseCase) :
+class ViewModelHome @Inject constructor(private val getPageFromAnimeVostUseCase: GetPageAnimeUseCase) :
     ViewModel() {
 
     private val _list = MutableStateFlow<StateUi<SnapshotStateList<AnimeDetails>>>(StateUi.Loader)
@@ -47,18 +45,10 @@ class ViewModelHome @Inject constructor(private val getPageAnimeUseCase: GetPage
 
     private suspend fun getData() {
         try {
-            val response = getPageAnimeUseCase.execute()
-            if (response.isSuccessful){
-                val body = response.body()?:return
-                Log.d("horizontalAlignment",body.size .toString())
-                _list.emit(StateUi.Success(body.toMutableStateList()))
-            }else{
-                Log.d("horizontalAlignment",response.errorBody()?.string() .toString())
-                _list.emit(StateUi.Failed())
-            }
-
+            val response = getPageFromAnimeVostUseCase.nextPage()
+            _list.emit(StateUi.Success(response))
         } catch (e: Exception) {
-            _list.emit(StateUi.Failed(e.message))
+            _list.emit(StateUi.Failed(e.message.toString()))
         }
     }
 
@@ -81,14 +71,14 @@ class ViewModelHome @Inject constructor(private val getPageAnimeUseCase: GetPage
 //    }
 
     fun avtoLoadAnime() {
-        viewModelScope.launch {
-            if (_list.value is StateUi.Success){
-                _progressNewAnime.emit(StateUi.Loader)
-//                val response = getPageAnimeVostUseCase.newPage()
+//        viewModelScope.launch {
+//            if (_list.value is StateUi.Success){
+//                _progressNewAnime.emit(StateUi.Loader)
+//                val response = getPageFromAnimeVostUseCase.nextPage()
 //                _list.emit(StateUi.Success(response))
-                _progressNewAnime.emit(StateUi.Success())
-            }
-
-        }
+//                _progressNewAnime.emit(StateUi.Success())
+//            }
+//
+//        }
     }
 }
