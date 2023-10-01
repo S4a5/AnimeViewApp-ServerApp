@@ -76,9 +76,10 @@ fun ScreenHome(
 @Composable
 fun Content(viewModelHome: ViewModelHome) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val stateUi by viewModelHome.stateUi.collectAsState()
         val listAnime by viewModelHome.list.collectAsState()
         val progress by viewModelHome.progressNewAnime.collectAsState()
-        when (val state = listAnime) {
+        when (val state = stateUi) {
             is StateUi.Failed -> {
                 Log.d("qweqweqwe",state.error.toString())
             }
@@ -103,7 +104,8 @@ fun Content(viewModelHome: ViewModelHome) {
                     contentPadding = PaddingValues(vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    items(state.data ?: emptyList()) {
+
+                    items(listAnime) {
                         Items(it)
                     }
 
@@ -143,7 +145,6 @@ fun Content(viewModelHome: ViewModelHome) {
 private fun Items(data: AnimeDetails) {
     val nameModels = data.nameModels.firstOrNull()?:return
     val voiceModels = data.voiceModels.firstOrNull()?:return
-//    val seriesModels = data.seriesModels
 
     Row(
         modifier = Modifier

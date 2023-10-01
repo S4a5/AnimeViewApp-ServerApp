@@ -21,13 +21,14 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = Gray_3,
     secondaryContainer = Border_Pink,
 
-    tertiary = Gray_2,
-
+//    tertiary = Gray_2,
     background = White,
     onBackground = Black,
 
     surface = White,
-    onSurface = Border_Pink
+    onSurface = Gray_1,
+
+
 )
 
 private val DarkColorScheme = darkColorScheme(

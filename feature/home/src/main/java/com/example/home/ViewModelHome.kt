@@ -5,8 +5,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.model.StateUi
-import com.example.core.model.ktor.AnimeDetails
-import com.example.home.data.anime_vost.GetPageAnimeUseCase
+import com.example.home.data.anime_vost.repository.PageAnimeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,20 +14,21 @@ import javax.inject.Inject
 import kotlin.Exception
 
 @HiltViewModel
-class ViewModelHome @Inject constructor(private val getPageFromAnimeVostUseCase: GetPageAnimeUseCase) :
+class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAnimeRepository) :
     ViewModel() {
 
-    private val _list = MutableStateFlow<StateUi<SnapshotStateList<AnimeDetails>>>(StateUi.Loader)
-    val list = _list.asStateFlow()
+    private val _stateUi = MutableStateFlow<StateUi<Nothing>>(StateUi.Loader)
+    val stateUi = _stateUi.asStateFlow()
+    val list = pageAnimeRepository.lastAnimeFlow
 
     private val _progressNewAnime = MutableStateFlow<StateUi<Nothing>>(StateUi.Loader)
     val progressNewAnime = _progressNewAnime.asStateFlow()
 
-    private val _genre = MutableStateFlow<StateUi<Map<String,String>>>(StateUi.Loader)
+    private val _genre = MutableStateFlow<StateUi<Map<String, String>>>(StateUi.Loader)
     val genre = _genre.asStateFlow()
 
     private val _selectGenre = mutableStateListOf<String>()
-    val selectGenre : List<String> = _selectGenre
+    val selectGenre: List<String> = _selectGenre
 
     init {
         viewModelScope.launch {
@@ -36,20 +36,31 @@ class ViewModelHome @Inject constructor(private val getPageFromAnimeVostUseCase:
 //            getGenre()
         }
     }
+
     fun onClickGenre(key: String) {
-        if (!_selectGenre.remove(key)){
+        if (!_selectGenre.remove(key)) {
             _selectGenre.add(key)
         }
     }
-
-    private suspend fun getData() {
+    private suspend fun getData(){
+        _stateUi.emit(StateUi.Loader)
         try {
-            val response = getPageFromAnimeVostUseCase.nextPage()
-            _list.emit(StateUi.Success(response))
-        } catch (e: Exception) {
-            _list.emit(StateUi.Failed(e.message.toString()))
+            pageAnimeRepository.requestNewAnime().let {
+                _stateUi.emit(StateUi.Success())
+            }
+        }catch (e:Exception){
+            _stateUi.emit(StateUi.Failed(e.message))
         }
+
     }
+//    private suspend fun getData() {
+//        try {
+//            val response = pageAnimeRepository.
+//            _list.emit(StateUi.Success(response))
+//        } catch (e: Exception) {
+//            _list.emit(StateUi.Failed(e.message.toString()))
+//        }
+//    }
 
 //    private suspend fun getGenre() {
 //        try {

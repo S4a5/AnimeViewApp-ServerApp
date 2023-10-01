@@ -192,7 +192,7 @@ fun ScreenSignIn() {
                 Text(
                     text = "Авторизоваться",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
 
                     )
             }
