@@ -13,12 +13,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.animeviewapp.bottom_bar.BottomNavigation
+import com.example.animeviewapp.glue.details.navigation.AdapterDetailsRoute
 import com.example.animeviewapp.glue.home.navigate.AdapterHomeRoute
 import com.example.animeviewapp.glue.sign_forget_password.navigate.AdapterSignForgetPasswordRoute
 import com.example.animeviewapp.glue.sign_in.navigate.AdapterSignInRoute
 import com.example.animeviewapp.glue.sign_up.navigate.AdapterSignUpRoute
 import com.example.animeviewapp.model.RouteScreen
 import com.example.core.ui.theme.AnimeViewAppTheme
+import com.example.details.navigation.routeScreenDetails
 import com.example.home.navigate.routeScreenHome
 import com.example.sign_forget_password.navigate.routeScreenSingForgetPassword
 import com.example.sign_up.navigate.routeScreenSingUp
@@ -40,6 +42,9 @@ class MainActivity @Inject constructor() : ComponentActivity() {
 
     @Inject
     lateinit var adapterHomeRoute: AdapterHomeRoute
+
+    @Inject
+    lateinit var adapterDetailsRoute: AdapterDetailsRoute
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -48,7 +53,11 @@ class MainActivity @Inject constructor() : ComponentActivity() {
                 adapterSignInRoute.setNavControl(navController)
                 adapterSignUpRoute.setNavControl(navController)
                 adapterSignForgetPasswordRoute.setNavControl(navController)
+
                 adapterHomeRoute.setNavControl(navController)
+                adapterHomeRoute.setRouteDetails(RouteScreen.SignDetails.route)
+
+                adapterDetailsRoute.setNavControl(navController)
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -74,6 +83,9 @@ class MainActivity @Inject constructor() : ComponentActivity() {
                         routeScreenSingForgetPassword(RouteScreen.SignForgetPassword.route)
 
                         routeScreenHome(RouteScreen.SignHome.route)
+
+                        routeScreenDetails(RouteScreen.SignDetails.route)
+
 
                     }
                 }

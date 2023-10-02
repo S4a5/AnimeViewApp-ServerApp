@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,9 +19,9 @@ import androidx.navigation.NavController
 import javax.inject.Inject
 
 @Composable
-fun ScreenDetails(navController: NavController,animeId:Int) {
-//    val viewModel = ViewModelProvider(LocalContext.current, viewModelFactory).get(ViewModelDetails::class.java)
+fun ScreenDetails(animeId:Int) {
     val viewModel:ViewModelDetails = hiltViewModel()
+    viewModel.setAnimeId(animeId)
     LazyColumn() {
         item {
             TopBar(viewModel = viewModel)
@@ -38,8 +40,9 @@ private fun TopBar(viewModel: ViewModelDetails) {
 
 @Composable
 private fun LeftTopBar(viewModel: ViewModelDetails) {
+    val view by viewModel.anime.collectAsState()
     Column {
-        Text(text = "111")
+        Text(text = view?.nameModels?.first()?.ru?:"11111")
     }
 }
 
