@@ -28,7 +28,7 @@ object AnimeVostModule {
     @Named("Ktor")
     fun provideRetrofitKtor( okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://192.168.40.117:8080")
+            .baseUrl("http://192.168.43.23:8080")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
