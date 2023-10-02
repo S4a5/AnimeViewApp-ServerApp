@@ -42,7 +42,7 @@ private fun TopBar(viewModel: ViewModelDetails) {
 private fun LeftTopBar(viewModel: ViewModelDetails) {
     val view by viewModel.anime.collectAsState()
     Column {
-        Text(text = view?.nameModels?.first()?.ru?:"11111")
+        Text(text = view?.nameModels?.first()?.ru?:"111111")
     }
 }
 
