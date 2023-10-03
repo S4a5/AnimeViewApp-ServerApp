@@ -45,7 +45,7 @@ private fun LeftTopBar(viewModel: ViewModelDetails) {
         Text(text = view?.nameModels?.first()?.ru?:"111111")
     }
 }
-//1
+//12321
 
 @Composable
 private fun RightTopBar(viewModel: ViewModelDetails) {
