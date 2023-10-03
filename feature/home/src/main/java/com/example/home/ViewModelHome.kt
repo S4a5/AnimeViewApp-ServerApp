@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.model.StateUi
 import com.example.home.data.anime_vost.repository.PageAnimeRepository
+import com.example.home.navigate.NavigateHome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +15,7 @@ import javax.inject.Inject
 import kotlin.Exception
 
 @HiltViewModel
-class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAnimeRepository) :
+class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAnimeRepository,private val navigateHome: NavigateHome) :
     ViewModel() {
 
     private val _stateUi = MutableStateFlow<StateUi<Nothing>>(StateUi.Loader)
@@ -90,5 +91,9 @@ class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAni
 //            }
 //
 //        }
+    }
+
+    fun selectAnime(animeId: Int) {
+        navigateHome.navigateToDetails(animeId)
     }
 }

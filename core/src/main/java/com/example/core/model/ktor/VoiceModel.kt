@@ -12,4 +12,8 @@ data class VoiceModel(
     val seriesCount: Int?,
     val last_change: Int?,
     val updated: Int?,
-)
+) {
+    fun selectAnime(animeId: Int) {
+
+    }
+}

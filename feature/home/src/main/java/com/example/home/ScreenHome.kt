@@ -106,7 +106,7 @@ fun Content(viewModelHome: ViewModelHome) {
                 ) {
 
                     items(listAnime) {
-                        Items(it)
+                        Items(it,viewModelHome)
                     }
 
                     if (progress is StateUi.Loader) {
@@ -142,14 +142,17 @@ fun Content(viewModelHome: ViewModelHome) {
 }
 
 @Composable
-private fun Items(data: AnimeDetails) {
+private fun Items(data: AnimeDetails,viewModelHome: ViewModelHome) {
     val nameModels = data.nameModels.firstOrNull()?:return
     val voiceModels = data.voiceModels.firstOrNull()?:return
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 10.dp),
+            .padding(vertical = 10.dp)
+            .clickable {
+                viewModelHome.selectAnime(data.voiceModels.last().anime_id)
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
