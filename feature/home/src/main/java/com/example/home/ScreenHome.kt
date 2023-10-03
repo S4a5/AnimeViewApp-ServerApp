@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -151,6 +152,7 @@ private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+//            .fillMaxHeight()
             .padding(vertical = 10.dp)
             .clickable {
                 viewModelHome.selectAnime(data.voiceModels.last().anime_id)
@@ -158,25 +160,28 @@ private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
+
         SubcomposeAsyncImage(
             model = voiceModels.urlImagePreview,
             loading = {
-                Icon(
-                    painter = ColorPainter(MaterialTheme.colorScheme.secondary),
-                    contentDescription = "",
+                Box(
                     modifier = Modifier
                         .fillMaxSize(0.35f)
+                        .height(170.dp)
                         .clip(RoundedCornerShape(10.dp))
-                )
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-
+                        .background(MaterialTheme.colorScheme.onSecondaryContainer)
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = MaterialTheme.colorScheme.surface
+                    )
+                }
             },
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxSize(0.35f)
                 .clip(RoundedCornerShape(10.dp))
-
         )
         Column(
             modifier = Modifier
@@ -263,7 +268,7 @@ fun Search() {
                                 Text(
                                     text = "Поиск",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.tertiary
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
                             it()
@@ -381,10 +386,16 @@ fun PreviewScreenHomeItems() {
         }
     }
 }
-//@Composable
-//@Preview
-//fun PreviewScreenHome() {
-//    AnimeViewAppTheme {
-//        ScreenHome()
-//    }
-//}
+
+@Composable
+@Preview(
+    device = "id:pixel_4a",
+    showSystemUi = true,
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF
+)
+fun PreviewScreenHome() {
+    AnimeViewAppTheme {
+
+    }
+}

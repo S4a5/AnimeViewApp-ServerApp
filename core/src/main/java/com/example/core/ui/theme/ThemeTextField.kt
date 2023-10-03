@@ -24,13 +24,13 @@ fun ThemeBox(fillMaxWidth: Float = 1f, box: @Composable () -> Unit) = Row(
     modifier = Modifier
         .border(
             width = 1.dp,
-            color = Color(0xFFDDD8D8),
+            color = MaterialTheme.colorScheme.secondaryContainer,
             shape = MaterialTheme.shapes.small
         )
         .fillMaxWidth(fillMaxWidth)
         .height(50.dp)
         .background(
-            color = Color(0xFFFAFAFA),
+            color = MaterialTheme.colorScheme.onSurface,
             shape = MaterialTheme.shapes.small
         )
         .padding(start = 16.dp, end = 16.dp),

@@ -13,4 +13,5 @@ interface KtorService {
         @Query("page") page: Int,
         @Query("count") quantity: Int = 5
     ): Response<List<AnimeDetails>>
+
 }

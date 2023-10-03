@@ -59,6 +59,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
+import com.example.core.UrlImageVoice
+import com.example.core.UrlServer
 import org.junit.internal.builders.AnnotatedBuilder
 
 @Composable
@@ -192,28 +194,21 @@ fun Body(viewModel: ViewModelDetails) {
                 fontSize = 16.sp
             )
             Row {
-                var i = 0
-                view?.voiceModels?.forEach{
 
-                    if (it.voiceGrupe == "anime_vost"){
-                        val a = i
-                        Icon(
-                            painter = painterResource(id = com.example.core.R.drawable.anime_vost),
-                            contentDescription = null,
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(20.dp).clickable { viewModel.setSelectViewVoice(a) }
-                        )
-                    }
-                    if (it.voiceGrupe == "anilibria"){
-                        val a = i
-                        Icon(
-                            painter = painterResource(id = com.example.core.R.drawable.anilibria),
-                            contentDescription = null,
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(20.dp).clickable { viewModel.setSelectViewVoice(a) }
-                        )
-                    }
-                    i++
+                view?.voiceModels?.forEachIndexed { i, it->
+
+                    SubcomposeAsyncImage(
+                        model = UrlServer + UrlImageVoice + "${it.voiceGrupe}.png",
+                        loading = {},
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable { viewModel.setSelectViewVoice(i) }
+                    )
+
+
                 }
             }
         }
@@ -363,7 +358,7 @@ private fun LeftTopBar(viewModel: ViewModelDetails) {
     val voiceModel by viewModel.voiceModel.collectAsState()
     Column(modifier = Modifier.fillMaxWidth(0.5f)) {
         Text(
-            text = nameModel?.ru ?:"",
+            text = nameModel?.ru ?: "",
             style = MaterialTheme.typography.titleMedium
         )
         Text(

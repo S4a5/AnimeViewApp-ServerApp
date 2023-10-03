@@ -1,5 +1,6 @@
 package com.example.data.di
 
+import com.example.core.UrlServer
 import com.example.data.AnilibriaService
 import com.example.data.AnimeVostService
 import com.example.data.KtorService
@@ -28,7 +29,7 @@ object AnimeVostModule {
     @Named("Ktor")
     fun provideRetrofitKtor( okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://192.168.40.117:8080")
+            .baseUrl(UrlServer)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

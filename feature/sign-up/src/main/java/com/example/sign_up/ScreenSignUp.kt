@@ -107,7 +107,7 @@ fun ScreenSignUp(viewModel:ViewModelSingUp = hiltViewModel()) {
                                 Text(
                                     text = "Электронная почта",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.tertiary
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
                             it()
@@ -128,7 +128,7 @@ fun ScreenSignUp(viewModel:ViewModelSingUp = hiltViewModel()) {
                         email.value = it
                     },
                     singleLine = true,
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSecondaryContainer),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     decorationBox = {
                         ThemeBox {
@@ -136,7 +136,7 @@ fun ScreenSignUp(viewModel:ViewModelSingUp = hiltViewModel()) {
                                 Text(
                                     text = "Email",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.tertiary
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
                             it()
@@ -175,7 +175,7 @@ fun ScreenSignUp(viewModel:ViewModelSingUp = hiltViewModel()) {
                                 Text(
                                     text = "Пароль",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.tertiary
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
                             val icon = if (isVisible.value) {
@@ -193,7 +193,7 @@ fun ScreenSignUp(viewModel:ViewModelSingUp = hiltViewModel()) {
                                         isVisible.value = isVisible.value.not()
                                     }
                                     .size(25.dp),
-                                tint = MaterialTheme.colorScheme.tertiary
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         }
 
@@ -214,7 +214,7 @@ fun ScreenSignUp(viewModel:ViewModelSingUp = hiltViewModel()) {
                 Text(
                     text = "Регистрация",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.clickable {
 
                     }

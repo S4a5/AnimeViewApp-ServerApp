@@ -73,7 +73,7 @@ class MainActivity @Inject constructor() : ComponentActivity() {
                     NavHost(
                         modifier = Modifier.padding(it),
                         navController = navController,
-                        startDestination = RouteScreen.SignIn.route,
+                        startDestination = RouteScreen.SignHome.route,
 
                         ) {
                         routeScreenSingIn(RouteScreen.SignIn.route)
@@ -89,8 +89,6 @@ class MainActivity @Inject constructor() : ComponentActivity() {
 
                     }
                 }
-
-
             }
         }
     }

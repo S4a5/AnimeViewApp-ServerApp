@@ -102,7 +102,7 @@ fun ScreenSignIn() {
                                     Text(
                                         text = "Электронная почта",
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.tertiary
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
                                     )
                                 }
                                 it()
@@ -143,7 +143,7 @@ fun ScreenSignIn() {
                                     Text(
                                         text = "Пароль",
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.tertiary
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
                                     )
                                 }
                                 it()
@@ -161,7 +161,7 @@ fun ScreenSignIn() {
                                         isVisible.value = isVisible.value.not()
                                     }
                                     .size(25.dp),
-                                tint = MaterialTheme.colorScheme.tertiary
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         }
 
@@ -238,7 +238,7 @@ fun ScreenSignIn() {
                     .fillMaxWidth()
                     .height(60.dp),
                 shape = MaterialTheme.shapes.extraSmall,
-                border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.tertiary),
+                border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer),
             ) {
 
                 Icon(
@@ -267,7 +267,7 @@ fun ScreenSignIn() {
                     .fillMaxWidth()
                     .height(60.dp),
                 shape = MaterialTheme.shapes.extraSmall,
-                border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.tertiary),
+                border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer),
             ) {
 
                 Icon(

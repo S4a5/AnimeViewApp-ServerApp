@@ -90,7 +90,7 @@ fun ScreenSignForgetPassword() {
                             email.value = it
                         },
                         singleLine = true,
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSecondaryContainer),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         decorationBox = {
                             ThemeBox {
@@ -125,7 +125,7 @@ fun ScreenSignForgetPassword() {
                 Text(
                     text = "Авторизоваться",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
 
                     )
             }
