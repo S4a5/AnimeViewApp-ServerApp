@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -81,8 +82,9 @@ fun Content(viewModelHome: ViewModelHome) {
         val progress by viewModelHome.progressNewAnime.collectAsState()
         when (val state = stateUi) {
             is StateUi.Failed -> {
-                Log.d("qweqweqwe",state.error.toString())
+                Log.d("qweqweqwe", state.error.toString())
             }
+
             StateUi.Loader -> {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
@@ -106,18 +108,18 @@ fun Content(viewModelHome: ViewModelHome) {
                 ) {
 
                     items(listAnime) {
-                        Items(it,viewModelHome)
+                        Items(it, viewModelHome)
                     }
 
                     if (progress is StateUi.Loader) {
                         item {
 
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .size(50.dp)
-                                        .fillMaxWidth(),
-                                    strokeWidth = 6.dp
-                                )
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .fillMaxWidth(),
+                                strokeWidth = 6.dp
+                            )
 
                         }
                     }
@@ -142,9 +144,9 @@ fun Content(viewModelHome: ViewModelHome) {
 }
 
 @Composable
-private fun Items(data: AnimeDetails,viewModelHome: ViewModelHome) {
-    val nameModels = data.nameModels.firstOrNull()?:return
-    val voiceModels = data.voiceModels.firstOrNull()?:return
+private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
+    val nameModels = data.nameModels.firstOrNull() ?: return
+    val voiceModels = data.voiceModels.firstOrNull() ?: return
 
     Row(
         modifier = Modifier
@@ -159,21 +161,27 @@ private fun Items(data: AnimeDetails,viewModelHome: ViewModelHome) {
         SubcomposeAsyncImage(
             model = voiceModels.urlImagePreview,
             loading = {
+                Icon(
+                    painter = ColorPainter(MaterialTheme.colorScheme.secondary),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .fillMaxSize(0.35f)
+                        .clip(RoundedCornerShape(10.dp))
+                )
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+
             },
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.Fit,
             modifier = Modifier
-                .fillMaxWidth(0.3f)
-                .fillMaxHeight(0.3f)
+                .fillMaxSize(0.35f)
                 .clip(RoundedCornerShape(10.dp))
-                .weight(0.05f)
+
         )
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .weight(0.1f),
+                .fillMaxSize()
+                .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -205,14 +213,14 @@ private fun Items(data: AnimeDetails,viewModelHome: ViewModelHome) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 for (model in data.voiceModels) {
-                    if (model.voiceGrupe == "anime_vost"){
+                    if (model.voiceGrupe == "anime_vost") {
                         Image(
                             painter = painterResource(com.example.core.R.drawable.anime_vost),
                             contentDescription = "",
                             modifier = Modifier.size(20.dp)
                         )
                     }
-                    if (model.voiceGrupe == "anilibria"){
+                    if (model.voiceGrupe == "anilibria") {
                         Image(
                             painter = painterResource(com.example.core.R.drawable.anilibria),
                             contentDescription = "",
