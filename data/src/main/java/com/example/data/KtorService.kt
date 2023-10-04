@@ -14,4 +14,8 @@ interface KtorService {
         @Query("count") quantity: Int = 5
     ): Response<List<AnimeDetails>>
 
+    @GET("search")
+    suspend fun getAnimeByName(
+        @Query("search") search: String,
+    ): Response<List<AnimeDetails>>
 }

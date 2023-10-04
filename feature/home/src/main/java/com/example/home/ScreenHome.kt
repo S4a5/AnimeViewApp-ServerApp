@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,13 +30,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
@@ -66,7 +67,7 @@ fun ScreenHome(
             .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Search()
+        Search(viewModelHome)
 
 //        RowGenre(viewModelHome)
 
@@ -77,9 +78,9 @@ fun ScreenHome(
 
 @Composable
 fun Content(viewModelHome: ViewModelHome) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
         val stateUi by viewModelHome.stateUi.collectAsState()
-        val listAnime by viewModelHome.list.collectAsState()
+        val listAnime by viewModelHome.viewList.collectAsState()
         val progress by viewModelHome.progressNewAnime.collectAsState()
         when (val state = stateUi) {
             is StateUi.Failed -> {
@@ -100,42 +101,59 @@ fun Content(viewModelHome: ViewModelHome) {
 
             is StateUi.Success -> {
                 val lazyState = rememberLazyListState()
-                LazyColumn(
-                    state = lazyState,
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f),
-                    contentPadding = PaddingValues(vertical = 10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+                if (listAnime.isNotEmpty()) {
+                    LazyColumn(
+                        state = lazyState,
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f),
+                        contentPadding = PaddingValues(vertical = 10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
 
-                    items(listAnime) {
-                        Items(it, viewModelHome)
-                    }
-
-                    if (progress is StateUi.Loader) {
-                        item {
-
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .fillMaxWidth(),
-                                strokeWidth = 6.dp
-                            )
-
+                        items(listAnime) {
+                            Items(it, viewModelHome)
                         }
+
+                        if (progress is StateUi.Loader) {
+                            item {
+
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .fillMaxWidth(),
+                                    strokeWidth = 6.dp
+                                )
+
+                            }
+                        }
+
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(0.5f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Нет результатов",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center
+                        )
                     }
 
                 }
-//                LaunchedEffect(lazyState) {
-//                    snapshotFlow { lazyState.layoutInfo }
-//                        .collect {
-//                            val lastVisibleItem =
-//                                lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-//                            if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
-//                                viewModelHome.avtoLoadAnime()
-//                            }
-//                        }
-//                }
+
+                LaunchedEffect(lazyState) {
+                    snapshotFlow { lazyState.layoutInfo }
+                        .collect {
+                            val lastVisibleItem =
+                                lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                            if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
+                                viewModelHome.avtoLoadAnime()
+                            }
+                        }
+                }
 
             }
         }
@@ -152,7 +170,6 @@ private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-//            .fillMaxHeight()
             .padding(vertical = 10.dp)
             .clickable {
                 viewModelHome.selectAnime(data.voiceModels.last().anime_id)
@@ -160,27 +177,23 @@ private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-
         SubcomposeAsyncImage(
             model = voiceModels.urlImagePreview,
             loading = {
-                Box(
+                Icon(
+                    painter = painterResource(id = com.example.core.R.drawable.ic_no_image),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
                     modifier = Modifier
-                        .fillMaxSize(0.35f)
-                        .height(170.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.onSecondaryContainer)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.surface
-                    )
-                }
+                        .height(175.dp)
+                        .fillMaxWidth(0.35f)
+                )
             },
             contentDescription = null,
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .fillMaxSize(0.35f)
+                .height(175.dp)
+                .fillMaxWidth(0.35f)
                 .clip(RoundedCornerShape(10.dp))
         )
         Column(
@@ -241,7 +254,7 @@ private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
 }
 
 @Composable
-fun Search() {
+fun Search(viewModelHome: ViewModelHome) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -250,13 +263,11 @@ fun Search() {
             .padding(top = 10.dp)
     ) {
         Column {
-            val email = remember {
-                mutableStateOf("")
-            }
+            val searchQuery by viewModelHome.searchQuery.collectAsState()
             BasicTextField(
-                value = email.value,
+                value = searchQuery,
                 onValueChange = {
-                    email.value = it
+                    viewModelHome.setSearchQuery(it)
                 },
                 singleLine = true,
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
@@ -264,7 +275,7 @@ fun Search() {
                 decorationBox = {
                     ThemeBox(0.9f) {
                         Box {
-                            if (email.value.isBlank()) {
+                            if (searchQuery.isBlank()) {
                                 Text(
                                     text = "Поиск",
                                     style = MaterialTheme.typography.labelSmall,
@@ -376,16 +387,6 @@ fun RowGenre(viewModelHome: ViewModelHome) {
 
 }
 
-@Composable
-@Preview(showSystemUi = true, showBackground = true, backgroundColor = 0xFFFFFFFF)
-fun PreviewScreenHomeItems() {
-    AnimeViewAppTheme {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Search()
-//            RowGenre()
-        }
-    }
-}
 
 @Composable
 @Preview(

@@ -8,5 +8,8 @@ import retrofit2.Response
 interface PageAnimeRepository {
 
     val lastAnimeFlow:StateFlow<List<AnimeDetails>>
+    val searchAnimeFlow:StateFlow<List<AnimeDetails>>
     suspend fun requestNewAnime()
+
+    suspend fun requestAnimeByName(query: String)
 }

@@ -22,7 +22,7 @@ class LastDataCache @Inject constructor(private val ktorService: KtorService) {
         if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
-                _lastAnimeFlow.emit(body)
+                _lastAnimeFlow.emit(_lastAnimeFlow.value + body)
                 page++
                 return
             }

@@ -1,15 +1,19 @@
 package com.example.home
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.MIN_LENGHT_SEARCH
 import com.example.core.model.StateUi
+import com.example.core.model.ktor.AnimeDetails
 import com.example.home.data.anime_vost.repository.PageAnimeRepository
 import com.example.home.navigate.NavigateHome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.Exception
@@ -18,11 +22,19 @@ import kotlin.Exception
 class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAnimeRepository,private val navigateHome: NavigateHome) :
     ViewModel() {
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
     private val _stateUi = MutableStateFlow<StateUi<Nothing>>(StateUi.Loader)
     val stateUi = _stateUi.asStateFlow()
-    val list = pageAnimeRepository.lastAnimeFlow
 
-    private val _progressNewAnime = MutableStateFlow<StateUi<Nothing>>(StateUi.Loader)
+    private val _viewList = MutableStateFlow<List<AnimeDetails>>(emptyList())
+    val viewList = _viewList.asStateFlow()
+
+    private val list = pageAnimeRepository.lastAnimeFlow
+    private val searchList = pageAnimeRepository.searchAnimeFlow
+
+    private val _progressNewAnime = MutableStateFlow<StateUi<Nothing>>(StateUi.Success())
     val progressNewAnime = _progressNewAnime.asStateFlow()
 
     private val _genre = MutableStateFlow<StateUi<Map<String, String>>>(StateUi.Loader)
@@ -35,7 +47,32 @@ class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAni
         viewModelScope.launch {
             getData()
 //            getGenre()
+
+            combine(list,searchList,_searchQuery){  lastAnime, searchAnime,searchQuery ->
+                val searchQueryTrim = searchQuery.trim()
+                if (searchQueryTrim.isNotBlank() && searchQueryTrim.length >= MIN_LENGHT_SEARCH ) {
+                    // Если есть данные в searchList, очистите _viewList и замените его данными из searchList
+                    _viewList.emit(value = searchAnime)
+                } else {
+                    if (searchQueryTrim.isBlank()){
+                        _viewList.emit(value = lastAnime)
+                    }
+                }
+            }.launchIn(viewModelScope)
+
         }
+
+    }
+    fun setSearchQuery(searchQuery:String){
+        viewModelScope.launch {
+            _searchQuery.value = searchQuery
+            val searchQueryTrim = searchQuery.trim()
+            if(searchQueryTrim.length >= MIN_LENGHT_SEARCH ){
+                pageAnimeRepository.requestAnimeByName(_searchQuery.value.lowercase().trim())
+            }
+
+        }
+
     }
 
     fun onClickGenre(key: String) {
@@ -54,14 +91,6 @@ class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAni
         }
 
     }
-//    private suspend fun getData() {
-//        try {
-//            val response = pageAnimeRepository.
-//            _list.emit(StateUi.Success(response))
-//        } catch (e: Exception) {
-//            _list.emit(StateUi.Failed(e.message.toString()))
-//        }
-//    }
 
 //    private suspend fun getGenre() {
 //        try {
@@ -82,15 +111,15 @@ class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAni
 //    }
 
     fun avtoLoadAnime() {
-//        viewModelScope.launch {
-//            if (_list.value is StateUi.Success){
-//                _progressNewAnime.emit(StateUi.Loader)
-//                val response = getPageFromAnimeVostUseCase.nextPage()
-//                _list.emit(StateUi.Success(response))
-//                _progressNewAnime.emit(StateUi.Success())
-//            }
-//
-//        }
+        viewModelScope.launch {
+            if (progressNewAnime.value is StateUi.Success && _searchQuery.value.isBlank() && viewList.value.isNotEmpty()){
+                _progressNewAnime.emit(StateUi.Loader)
+                pageAnimeRepository.requestNewAnime().let {
+                    _progressNewAnime.emit(StateUi.Success())
+                }
+            }
+
+        }
     }
 
     fun selectAnime(animeId: Int) {
