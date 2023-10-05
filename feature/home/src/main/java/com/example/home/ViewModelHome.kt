@@ -1,6 +1,5 @@
 package com.example.home
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,7 +18,10 @@ import javax.inject.Inject
 import kotlin.Exception
 
 @HiltViewModel
-class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAnimeRepository,private val navigateHome: NavigateHome) :
+class ViewModelHome @Inject constructor(
+    private val pageAnimeRepository: PageAnimeRepository,
+    private val navigateHome: NavigateHome
+) :
     ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -48,13 +50,13 @@ class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAni
             getData()
 //            getGenre()
 
-            combine(list,searchList,_searchQuery){  lastAnime, searchAnime,searchQuery ->
+            combine(list, searchList, _searchQuery) { lastAnime, searchAnime, searchQuery ->
                 val searchQueryTrim = searchQuery.trim()
-                if (searchQueryTrim.isNotBlank() && searchQueryTrim.length >= MIN_LENGHT_SEARCH ) {
+                if (searchQueryTrim.isNotBlank() && searchQueryTrim.length >= MIN_LENGHT_SEARCH) {
                     // Если есть данные в searchList, очистите _viewList и замените его данными из searchList
                     _viewList.emit(value = searchAnime)
                 } else {
-                    if (searchQueryTrim.isBlank()){
+                    if (searchQueryTrim.isBlank()) {
                         _viewList.emit(value = lastAnime)
                     }
                 }
@@ -63,16 +65,19 @@ class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAni
         }
 
     }
-    fun setSearchQuery(searchQuery:String){
+
+    fun setSearchQuery(searchQuery: String) {
         viewModelScope.launch {
             _searchQuery.value = searchQuery
             val searchQueryTrim = searchQuery.trim()
-            if(searchQueryTrim.length >= MIN_LENGHT_SEARCH ){
-                pageAnimeRepository.requestAnimeByName(_searchQuery.value.lowercase().trim())
+            if (searchQueryTrim.length >= MIN_LENGHT_SEARCH) {
+                try {
+                    pageAnimeRepository.requestAnimeByName(_searchQuery.value.lowercase().trim())
+                } catch (e: Exception) {
+                    _stateUi.emit(StateUi.Failed(e.message))
+                }
             }
-
         }
-
     }
 
     fun onClickGenre(key: String) {
@@ -80,13 +85,14 @@ class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAni
             _selectGenre.add(key)
         }
     }
-    private suspend fun getData(){
+
+    private suspend fun getData() {
         _stateUi.emit(StateUi.Loader)
         try {
             pageAnimeRepository.requestNewAnime().let {
                 _stateUi.emit(StateUi.Success())
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             _stateUi.emit(StateUi.Failed(e.message))
         }
 
@@ -112,10 +118,19 @@ class ViewModelHome @Inject constructor(private val pageAnimeRepository: PageAni
 
     fun avtoLoadAnime() {
         viewModelScope.launch {
-            if (progressNewAnime.value is StateUi.Success && _searchQuery.value.isBlank() && viewList.value.isNotEmpty()){
+            if (progressNewAnime.value is StateUi.Success && _searchQuery.value.isBlank() && viewList.value.isNotEmpty()) {
                 _progressNewAnime.emit(StateUi.Loader)
-                pageAnimeRepository.requestNewAnime().let {
-                    _progressNewAnime.emit(StateUi.Success())
+                try {
+                    pageAnimeRepository.requestNewAnime().let {
+
+                        _progressNewAnime.emit(StateUi.Success())
+
+
+                    }
+                } catch (e: Exception) {
+                    _progressNewAnime.emit(StateUi.Failed(e.message))
+                }catch (e: Throwable) {
+                    _progressNewAnime.emit(StateUi.Failed(e.message))
                 }
             }
 

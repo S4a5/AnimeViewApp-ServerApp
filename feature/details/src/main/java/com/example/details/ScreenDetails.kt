@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -65,10 +66,15 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.ImageLoader
 import coil.compose.SubcomposeAsyncImage
+import coil.disk.DiskCache
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.core.UrlImageVoice
 import com.example.core.UrlServer
 import com.example.core.model.ktor.SeriesModel
+import com.google.ar.core.Config
 import org.junit.internal.builders.AnnotatedBuilder
 
 @Composable
@@ -357,8 +363,16 @@ fun Series(viewModel: ViewModelDetails) {
 @Composable
 private fun ItemSeries(it: SeriesModel, viewModel: ViewModelDetails) {
     Box(contentAlignment = Alignment.TopEnd, modifier = Modifier.clip(RoundedCornerShape(10.dp))) {
+        val request: ImageRequest = ImageRequest.Builder(LocalContext.current.applicationContext)
+            .data(it.preview)
+//            .data(space.img)
+            .crossfade(true)
+//            .diskCacheKey(space.img)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .setHeader("Cache-Control", "max-age=31536000")
+            .build()
         SubcomposeAsyncImage(
-            model = it.preview,
+            model = request,
             loading = {
                 Box(
                     modifier = Modifier
@@ -371,9 +385,10 @@ private fun ItemSeries(it: SeriesModel, viewModel: ViewModelDetails) {
                 }
             },
             contentDescription = null,
-            contentScale = ContentScale.FillHeight,
+            contentScale = ContentScale.Inside,
             modifier = Modifier
                 .height(120.dp)
+                .sizeIn(maxWidth = 200.dp, minWidth = 150.dp)
                 .align(Alignment.TopEnd)
         )
         Box(

@@ -2,6 +2,7 @@ package com.example.home
 
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -78,13 +79,17 @@ fun ScreenHome(
 
 @Composable
 fun Content(viewModelHome: ViewModelHome) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         val stateUi by viewModelHome.stateUi.collectAsState()
         val listAnime by viewModelHome.viewList.collectAsState()
         val progress by viewModelHome.progressNewAnime.collectAsState()
         when (val state = stateUi) {
             is StateUi.Failed -> {
-                Log.d("qweqweqwe", state.error.toString())
+                Toast.makeText(LocalContext.current, state.error.toString(), Toast.LENGTH_SHORT)
+                    .show()
             }
 
             StateUi.Loader -> {
@@ -124,6 +129,16 @@ fun Content(viewModelHome: ViewModelHome) {
                                     strokeWidth = 6.dp
                                 )
 
+                            }
+                        }
+                        if (progress is StateUi.Failed) {
+                            item {
+                                Text(
+                                    text = (progress as StateUi.Failed).error ?: "qqqq",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    textAlign = TextAlign.Center
+                                )
                             }
                         }
 

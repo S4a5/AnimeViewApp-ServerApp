@@ -72,6 +72,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.test:monitor:1.6.1")
     implementation("androidx.test.ext:junit-ktx:1.1.5")
+    implementation("com.google.ar:core:1.39.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     implementation(project(":core"))
