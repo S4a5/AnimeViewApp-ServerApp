@@ -13,11 +13,11 @@ import com.example.details.ScreenDetails
 fun NavGraphBuilder.routeScreenDetails(route: String) {
     composable("$route/{animeId}",listOf(navArgument("animeId") { type = NavType.IntType })) { entry ->
         val id = entry.arguments?.getInt("animeId")
-
         id?.let {
             ScreenDetails(it)
         }?: kotlin.run {
             Toast.makeText(LocalContext.current,"null animeId",Toast.LENGTH_LONG).show()
+            ScreenDetails(4333)
         }
 
     }

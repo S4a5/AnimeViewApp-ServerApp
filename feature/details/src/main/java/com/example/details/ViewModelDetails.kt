@@ -16,6 +16,10 @@ import javax.inject.Inject
 @HiltViewModel
 class ViewModelDetails @Inject constructor(private val getAnimeByIdRepository: GetAnimeByIdRepository) :
     ViewModel() {
+
+    private val _seriesText = MutableStateFlow("")
+    val seriesText = _seriesText.asStateFlow()
+
     private val _anime = MutableStateFlow<AnimeDetails?>(null)
     val anime = _anime.asStateFlow()
 
@@ -28,6 +32,8 @@ class ViewModelDetails @Inject constructor(private val getAnimeByIdRepository: G
 
     val nameModel = _nameModel.asStateFlow()
     val voiceModel = _voiceModel.asStateFlow()
+
+
     fun setAnimeId(animeId: Int) {
         viewModelScope.launch {
             _anime.emit(getAnimeByIdRepository.getAnimeByIdRepository(animeId))
@@ -43,5 +49,7 @@ class ViewModelDetails @Inject constructor(private val getAnimeByIdRepository: G
         }
     }
 
-
+    fun setSeriesText(it:String) {
+        _seriesText.value = it
+    }
 }

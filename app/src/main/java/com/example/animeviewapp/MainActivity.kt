@@ -6,11 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.animeviewapp.bottom_bar.BottomNavigation
 import com.example.animeviewapp.glue.details.navigation.AdapterDetailsRoute
@@ -26,6 +24,7 @@ import com.example.sign_forget_password.navigate.routeScreenSingForgetPassword
 import com.example.sign_up.navigate.routeScreenSingUp
 import com.example.sing_in.navigate.routeScreenSingIn
 import dagger.hilt.android.AndroidEntryPoint
+import okhttp3.internal.wait
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -55,7 +54,7 @@ class MainActivity @Inject constructor() : ComponentActivity() {
                 adapterSignForgetPasswordRoute.setNavControl(navController)
 
                 adapterHomeRoute.setNavControl(navController)
-                adapterHomeRoute.setRouteDetails(RouteScreen.SignDetails.route)
+                adapterHomeRoute.setRouteDetails(RouteScreen.Details.route)
 
                 adapterDetailsRoute.setNavControl(navController)
 
@@ -84,7 +83,7 @@ class MainActivity @Inject constructor() : ComponentActivity() {
 
                         routeScreenHome(RouteScreen.SignHome.route)
 
-                        routeScreenDetails(RouteScreen.SignDetails.route)
+                        routeScreenDetails(RouteScreen.Details.route)
 
 
                     }

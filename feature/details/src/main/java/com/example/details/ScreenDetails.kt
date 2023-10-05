@@ -1,5 +1,6 @@
 package com.example.details
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -22,7 +23,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.CloudDownload
@@ -41,8 +44,10 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +59,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,6 +68,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import com.example.core.UrlImageVoice
 import com.example.core.UrlServer
+import com.example.core.model.ktor.SeriesModel
 import org.junit.internal.builders.AnnotatedBuilder
 
 @Composable
@@ -88,83 +96,88 @@ fun ScreenDetails(animeId: Int) {
 }
 
 @Composable
-fun Series(viewModel: ViewModelDetails) {
-    val view by viewModel.anime.collectAsState()
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
+private fun LeftTopBar(viewModel: ViewModelDetails) {
+    val nameModel by viewModel.nameModel.collectAsState()
+    val voiceModel by viewModel.voiceModel.collectAsState()
+    Column(modifier = Modifier.fillMaxWidth(0.5f)) {
         Text(
-            text = "Episode",
-            Modifier.fillMaxWidth(0.9f),
-            style = MaterialTheme.typography.titleMedium
+            text = nameModel?.ru ?: "",
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 4,
+            overflow = TextOverflow.Ellipsis
         )
-        val textSearch = remember {
-            mutableStateOf("")
-        }
-        OutlinedTextField(
-            value = textSearch.value,
-            onValueChange = {
-                textSearch.value = it
-            },
-            modifier = Modifier.fillMaxWidth(0.9f),
-            colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondary,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSecondary,
-                disabledContainerColor = MaterialTheme.colorScheme.secondary,
-                disabledIndicatorColor = MaterialTheme.colorScheme.onSecondary,
-                focusedContainerColor = MaterialTheme.colorScheme.secondary,
-                focusedIndicatorColor = MaterialTheme.colorScheme.onSecondary,
-                focusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                disabledTextColor = MaterialTheme.colorScheme.onSecondary
-            ),
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.Search,
-                    contentDescription = "",
-                    tint = MaterialTheme.colorScheme.onSecondary
-                )
-            },
-            placeholder = {
-                Text(text = "Серия", color = MaterialTheme.colorScheme.onSecondary)
-            },
+        Text(
+            text = voiceModel?.updated.toString() ?: "111111",
+            style = MaterialTheme.typography.labelMedium
+        )
+    }
+}
 
-            shape = RoundedCornerShape(12.dp),
-            singleLine = true
+@Composable
+private fun RightTopBar(viewModel: ViewModelDetails) {
+    val voiceModel by viewModel.voiceModel.collectAsState()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(1f)
+            .fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        SubcomposeAsyncImage(
+            model = voiceModel?.urlImagePreview,
+            loading = {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            },
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
         )
 
-        val pading = LocalContext.current.resources.displayMetrics.xdpi / 10 / 2
+    }
+}
 
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(20.dp),
-            contentPadding = PaddingValues(horizontal = pading.dp)
+@Composable
+private fun TopBar(viewModel: ViewModelDetails) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.tertiary)
+                .fillMaxWidth()
+                .height(260.dp)
+                .align(Alignment.TopCenter),
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .fillMaxHeight(1f)
+                .align(Alignment.TopCenter),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            items(view?.seriesModels?.last() ?: emptyList()) {
-                SubcomposeAsyncImage(
-                    model = it.preview,
-                    loading = {
-//
-                        Box(
-                            modifier = Modifier
-                                .background(MaterialTheme.colorScheme.onSecondary)
-                                .height(120.dp)
-//                                        .width(200.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                        ) {
-                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                        }
-                    },
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .height(120.dp)
-//                                .fillMaxWidth(0.2f)
-                        .clip(RoundedCornerShape(10.dp))
-                )
-            }
+            LeftTopBar(viewModel)
+            RightTopBar(viewModel)
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 10.dp, start = 10.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.ArrowBack,
+                contentDescription = "",
+                modifier = Modifier.size(30.dp)
+            )
         }
     }
+
+
 }
 
 @Composable
@@ -195,7 +208,7 @@ fun Body(viewModel: ViewModelDetails) {
             )
             Row {
 
-                view?.voiceModels?.forEachIndexed { i, it->
+                view?.voiceModels?.forEachIndexed { i, it ->
 
                     SubcomposeAsyncImage(
                         model = UrlServer + UrlImageVoice + "${it.voiceGrupe}.png",
@@ -271,125 +284,126 @@ fun Body(viewModel: ViewModelDetails) {
 }
 
 @Composable
-private fun PlayerAndDownLoadSeries(viewModel: ViewModelDetails) {
-    Row(
-        modifier = Modifier.fillMaxWidth(0.9f),
-        horizontalArrangement = Arrangement.SpaceBetween
+fun Series(viewModel: ViewModelDetails) {
+    val view by viewModel.anime.collectAsState()
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Button(onClick = {
-
-        }) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.PlayCircleFilled,
-                    contentDescription = "",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-                Text(text = "Смотреть", color = MaterialTheme.colorScheme.onPrimary)
-            }
-        }
-
-        OutlinedButton(onClick = {
-
-        }, border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.CloudDownload,
-                    contentDescription = "",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Text(text = "Скачать", color = MaterialTheme.colorScheme.primary)
-            }
-        }
-    }
-}
-
-@Composable
-private fun TopBar(viewModel: ViewModelDetails) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(300.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.tertiary)
-                .fillMaxWidth()
-                .height(260.dp)
-                .align(Alignment.TopCenter),
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .fillMaxHeight(1f)
-                .align(Alignment.TopCenter),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            LeftTopBar(viewModel)
-            RightTopBar(viewModel)
-        }
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 10.dp, start = 10.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.ArrowBack,
-                contentDescription = "",
-                modifier = Modifier.size(30.dp)
-            )
-        }
-    }
-
-
-}
-
-@Composable
-private fun LeftTopBar(viewModel: ViewModelDetails) {
-    val nameModel by viewModel.nameModel.collectAsState()
-    val voiceModel by viewModel.voiceModel.collectAsState()
-    Column(modifier = Modifier.fillMaxWidth(0.5f)) {
         Text(
-            text = nameModel?.ru ?: "",
+            text = "Episode",
+            Modifier.fillMaxWidth(0.9f),
             style = MaterialTheme.typography.titleMedium
         )
-        Text(
-            text = voiceModel?.updated.toString() ?: "111111",
-            style = MaterialTheme.typography.labelMedium
+        val seriesText by viewModel.seriesText.collectAsState()
+        OutlinedTextField(
+            value = seriesText,
+            onValueChange = {
+                viewModel.setSeriesText(it)
+            },
+            modifier = Modifier.fillMaxWidth(0.9f),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSecondary,
+                disabledContainerColor = MaterialTheme.colorScheme.secondary,
+                disabledIndicatorColor = MaterialTheme.colorScheme.onSecondary,
+                focusedContainerColor = MaterialTheme.colorScheme.secondary,
+                focusedIndicatorColor = MaterialTheme.colorScheme.onSecondary,
+                focusedTextColor = MaterialTheme.colorScheme.onSecondary,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
+                disabledTextColor = MaterialTheme.colorScheme.onSecondary
+            ),
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Rounded.Search,
+                    contentDescription = "",
+                    tint = MaterialTheme.colorScheme.onSecondary
+                )
+            },
+            placeholder = {
+                Text(text = "Серия", color = MaterialTheme.colorScheme.onSecondary)
+            },
+
+            shape = RoundedCornerShape(12.dp),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default
         )
+
+
+        val pading = LocalContext.current.resources.displayMetrics.xdpi / 10 / 2
+        var list = remember {
+            mutableStateListOf<SeriesModel>()
+        }
+        view?.seriesModels?.forEach {
+            if (it.size > list.size) {
+                list = it.toMutableStateList()
+            }
+        }
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(horizontal = pading.dp)
+        ) {
+
+
+            items(list) {
+
+                ItemSeries(it = it, viewModel)
+            }
+
+        }
     }
 }
 
 @Composable
-private fun RightTopBar(viewModel: ViewModelDetails) {
-    val voiceModel by viewModel.voiceModel.collectAsState()
-    Column(
-        modifier = Modifier
-            .fillMaxWidth(1f)
-            .fillMaxHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
-    ) {
+private fun ItemSeries(it: SeriesModel, viewModel: ViewModelDetails) {
+    Box(contentAlignment = Alignment.TopEnd, modifier = Modifier.clip(RoundedCornerShape(10.dp))) {
         SubcomposeAsyncImage(
-            model = voiceModel?.urlImagePreview,
+            model = it.preview,
             loading = {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                Box(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.onSecondary)
+                        .height(120.dp)
+                        .width(200.dp)
+                        .align(Alignment.TopEnd)
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
             },
             contentDescription = null,
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.FillHeight,
             modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
+                .height(120.dp)
+                .align(Alignment.TopEnd)
         )
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .background(
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = CutCornerShape(
+                        bottomStart = 100.dp,
+                    )
+                ),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Text(
+                text = it.name ?: "null",
+                color = MaterialTheme.colorScheme.onPrimary,
+                style = MaterialTheme.typography.titleSmall,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(start = 25.dp, end = 20.dp)
+            )
+        }
 
     }
 }
+
+
+
+
+
 

@@ -5,7 +5,9 @@ import com.example.data.KtorService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SearchDataCache @Inject constructor(private val ktorService: KtorService) {
     private val _searchAnimeFlow = MutableStateFlow<List<AnimeDetails>>(emptyList())
     val searchAnimeFlow = _searchAnimeFlow.asStateFlow()
@@ -26,5 +28,8 @@ class SearchDataCache @Inject constructor(private val ktorService: KtorService) 
         }
         throw Throwable("no information about the problem")
     }
-
+    fun getAnimeById(animeId:Int):AnimeDetails{
+        val animeDetails = _searchAnimeFlow.value.find { it.voiceModels.first().anime_id == animeId }
+        return animeDetails ?: throw Throwable("no anime found by id")
+    }
 }
