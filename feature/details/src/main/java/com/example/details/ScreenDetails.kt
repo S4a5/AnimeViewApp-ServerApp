@@ -1,6 +1,7 @@
 package com.example.details
 
 import android.util.Log
+import android.view.WindowManager
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -43,6 +45,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -65,6 +68,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.SubcomposeAsyncImage
@@ -74,18 +78,19 @@ import coil.request.ImageRequest
 import com.example.core.UrlImageVoice
 import com.example.core.UrlServer
 import com.example.core.model.ktor.SeriesModel
-import com.google.ar.core.Config
-import org.junit.internal.builders.AnnotatedBuilder
 
 @Composable
 fun ScreenDetails(animeId: Int) {
     val viewModel: ViewModelDetails = hiltViewModel()
     viewModel.setAnimeId(animeId)
+//    WindowCompat.setDecorFitsSystemWindows(false)
+
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp),
-        contentPadding = PaddingValues(bottom = 40.dp)
-    ) {
+        contentPadding = PaddingValues(bottom = 40.dp),
+
+        ) {
         item {
             TopBar(viewModel = viewModel)
         }
@@ -99,6 +104,8 @@ fun ScreenDetails(animeId: Int) {
             Series(viewModel)
         }
     }
+
+
 }
 
 @Composable
@@ -292,6 +299,14 @@ fun Body(viewModel: ViewModelDetails) {
 @Composable
 fun Series(viewModel: ViewModelDetails) {
     val view by viewModel.anime.collectAsState()
+    val seriesText by viewModel.seriesText.collectAsState()
+    val scrollAnime by viewModel.scrollAnime.collectAsState()
+    val listSeries by viewModel.listSeries.collectAsState()
+
+    val listState = rememberLazyListState()
+    LaunchedEffect(key1 = scrollAnime) {
+        listState.animateScrollToItem(scrollAnime)
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -301,7 +316,7 @@ fun Series(viewModel: ViewModelDetails) {
             Modifier.fillMaxWidth(0.9f),
             style = MaterialTheme.typography.titleMedium
         )
-        val seriesText by viewModel.seriesText.collectAsState()
+
         OutlinedTextField(
             value = seriesText,
             onValueChange = {
@@ -337,21 +352,16 @@ fun Series(viewModel: ViewModelDetails) {
 
 
         val pading = LocalContext.current.resources.displayMetrics.xdpi / 10 / 2
-        var list = remember {
-            mutableStateListOf<SeriesModel>()
-        }
-        view?.seriesModels?.forEach {
-            if (it.size > list.size) {
-                list = it.toMutableStateList()
-            }
-        }
+
         LazyRow(
+            state = listState,
             horizontalArrangement = Arrangement.spacedBy(20.dp),
-            contentPadding = PaddingValues(horizontal = pading.dp)
-        ) {
+            contentPadding = PaddingValues(horizontal = pading.dp),
+
+            ) {
 
 
-            items(list) {
+            items(listSeries) {
 
                 ItemSeries(it = it, viewModel)
             }
@@ -385,7 +395,7 @@ private fun ItemSeries(it: SeriesModel, viewModel: ViewModelDetails) {
                 }
             },
             contentDescription = null,
-            contentScale = ContentScale.Inside,
+            contentScale = ContentScale.FillBounds,
             modifier = Modifier
                 .height(120.dp)
                 .sizeIn(maxWidth = 200.dp, minWidth = 150.dp)

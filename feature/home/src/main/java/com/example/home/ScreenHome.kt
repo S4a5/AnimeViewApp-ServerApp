@@ -86,13 +86,20 @@ fun Content(viewModelHome: ViewModelHome) {
         val stateUi by viewModelHome.stateUi.collectAsState()
         val listAnime by viewModelHome.viewList.collectAsState()
         val progress by viewModelHome.progressNewAnime.collectAsState()
-        when (val state = stateUi) {
-            is StateUi.Failed -> {
-                Toast.makeText(LocalContext.current, state.error.toString(), Toast.LENGTH_SHORT)
-                    .show()
+
+        when {
+            stateUi is StateUi.Failed && listAnime.isEmpty() -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = (stateUi as StateUi.Failed).error ?: "qqqq",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
 
-            StateUi.Loader -> {
+            stateUi is StateUi.Loader -> {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
                         modifier = Modifier
@@ -104,7 +111,7 @@ fun Content(viewModelHome: ViewModelHome) {
 
             }
 
-            is StateUi.Success -> {
+            stateUi is StateUi.Success || listAnime.isNotEmpty()-> {
                 val lazyState = rememberLazyListState()
                 if (listAnime.isNotEmpty()) {
                     LazyColumn(
@@ -131,17 +138,6 @@ fun Content(viewModelHome: ViewModelHome) {
 
                             }
                         }
-                        if (progress is StateUi.Failed) {
-                            item {
-                                Text(
-                                    text = (progress as StateUi.Failed).error ?: "qqqq",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
-
                     }
                 } else {
                     Box(
@@ -170,6 +166,10 @@ fun Content(viewModelHome: ViewModelHome) {
                         }
                 }
 
+            }
+
+            else -> {
+                Text(text = "Что то не так")
             }
         }
 

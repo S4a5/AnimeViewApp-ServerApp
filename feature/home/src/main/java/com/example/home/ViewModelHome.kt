@@ -75,6 +75,8 @@ class ViewModelHome @Inject constructor(
                     pageAnimeRepository.requestAnimeByName(_searchQuery.value.lowercase().trim())
                 } catch (e: Exception) {
                     _stateUi.emit(StateUi.Failed(e.message))
+                } catch (e: Throwable) {
+                    _stateUi.emit(StateUi.Failed(e.message))
                 }
             }
         }
@@ -93,6 +95,8 @@ class ViewModelHome @Inject constructor(
                 _stateUi.emit(StateUi.Success())
             }
         } catch (e: Exception) {
+            _stateUi.emit(StateUi.Failed(e.message))
+        } catch (e: Throwable) {
             _stateUi.emit(StateUi.Failed(e.message))
         }
 
