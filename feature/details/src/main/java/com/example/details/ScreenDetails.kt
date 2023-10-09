@@ -1,13 +1,9 @@
 package com.example.details
 
-import android.util.Log
-import android.view.WindowManager
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,22 +20,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.CloudDownload
-import androidx.compose.material.icons.outlined.PlayCircleFilled
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.StarRate
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -48,44 +39,47 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.ImageLoader
 import coil.compose.SubcomposeAsyncImage
-import coil.disk.DiskCache
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.core.UrlImageVoice
 import com.example.core.UrlServer
 import com.example.core.model.ktor.SeriesModel
 
+private const val ITEM_SERIES = 2
+
 @Composable
 fun ScreenDetails(animeId: Int) {
     val viewModel: ViewModelDetails = hiltViewModel()
     viewModel.setAnimeId(animeId)
-//    WindowCompat.setDecorFitsSystemWindows(false)
+    val focusEpisode by viewModel.focusEpisode.collectAsState()
+
+    val listState = rememberLazyListState()
+    LaunchedEffect(key1 = focusEpisode) {
+        if (focusEpisode) {
+            listState.animateScrollToItem(ITEM_SERIES)
+        }
+
+    }
 
     LazyColumn(
+        state = listState,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp),
         contentPadding = PaddingValues(bottom = 40.dp),
@@ -104,8 +98,6 @@ fun ScreenDetails(animeId: Int) {
             Series(viewModel)
         }
     }
-
-
 }
 
 @Composable
@@ -322,7 +314,11 @@ fun Series(viewModel: ViewModelDetails) {
             onValueChange = {
                 viewModel.setSeriesText(it)
             },
-            modifier = Modifier.fillMaxWidth(0.9f),
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .onFocusChanged {
+                    viewModel.onFocusEpisode(it.isFocused)
+                },
             colors = TextFieldDefaults.colors(
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondary,
                 unfocusedIndicatorColor = MaterialTheme.colorScheme.onSecondary,
@@ -361,9 +357,8 @@ fun Series(viewModel: ViewModelDetails) {
             ) {
 
 
-            items(listSeries) {
-
-                ItemSeries(it = it, viewModel)
+            itemsIndexed(listSeries) {index,it->
+                ItemSeries(it = it, viewModel,index)
             }
 
         }
@@ -371,13 +366,17 @@ fun Series(viewModel: ViewModelDetails) {
 }
 
 @Composable
-private fun ItemSeries(it: SeriesModel, viewModel: ViewModelDetails) {
-    Box(contentAlignment = Alignment.TopEnd, modifier = Modifier.clip(RoundedCornerShape(10.dp))) {
+private fun ItemSeries(it: SeriesModel, viewModel: ViewModelDetails,index:Int) {
+    Box(
+        contentAlignment = Alignment.TopEnd,
+        modifier = Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .clickable {
+                viewModel.onClickSeries(it,index)
+            }) {
         val request: ImageRequest = ImageRequest.Builder(LocalContext.current.applicationContext)
             .data(it.preview)
-//            .data(space.img)
             .crossfade(true)
-//            .diskCacheKey(space.img)
             .diskCachePolicy(CachePolicy.ENABLED)
             .setHeader("Cache-Control", "max-age=31536000")
             .build()

@@ -1,17 +1,16 @@
 package com.example.details
 
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewModelScope
 import com.example.core.model.ktor.AnimeDetails
 import com.example.core.model.ktor.SeriesModel
 import com.example.details.data.repository.GetAnimeByIdRepository
+import com.example.details.navigation.NavigationDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -20,7 +19,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ViewModelDetails @Inject constructor(private val getAnimeByIdRepository: GetAnimeByIdRepository) :
+class ViewModelDetails @Inject constructor(
+    private val getAnimeByIdRepository: GetAnimeByIdRepository,
+    private val navigationDetails: NavigationDetails
+) :
     ViewModel() {
 
     private val _seriesText = MutableStateFlow("")
@@ -30,7 +32,6 @@ class ViewModelDetails @Inject constructor(private val getAnimeByIdRepository: G
     val anime = _anime.asStateFlow()
 
     private val _selectViewVoice = MutableStateFlow<Int>(0)
-//    val selectViewVoice = _selectViewVoice.asStateFlow()
 
     private val _listSeries = MutableStateFlow<List<SeriesModel>>(emptyList())
     val listSeries = _listSeries.asStateFlow()
@@ -42,8 +43,13 @@ class ViewModelDetails @Inject constructor(private val getAnimeByIdRepository: G
     val nameModel = _nameModel.asStateFlow()
     val voiceModel = _voiceModel.asStateFlow()
 
+    private val _focusEpisode = MutableStateFlow(false)
+    val focusEpisode = _focusEpisode.asStateFlow()
+
     private val _scrollAnime = MutableStateFlow(0)
     val scrollAnime = _scrollAnime.asStateFlow()
+
+    private val _animeId = mutableIntStateOf(0)
 
     init {
         _anime.onEach {
@@ -72,6 +78,7 @@ class ViewModelDetails @Inject constructor(private val getAnimeByIdRepository: G
         viewModelScope.launch {
             _anime.emit(getAnimeByIdRepository.getAnimeByIdRepository(animeId))
             setSelectViewVoice(0)
+            _animeId.intValue = animeId
         }
     }
 
@@ -85,5 +92,22 @@ class ViewModelDetails @Inject constructor(private val getAnimeByIdRepository: G
 
     fun setSeriesText(it: String) {
         _seriesText.value = it
+    }
+
+    fun onFocusEpisode(focused: Boolean) {
+        _focusEpisode.value = focused
+    }
+
+    fun onClickSeries(seriesModel: SeriesModel, indexSeries: Int) {
+        val voiceModel = _anime.value?.voiceModels?.find {
+            seriesModel.voice_id == it.id
+        }
+        if (voiceModel != null) {
+            navigationDetails.openVideoPlayer(
+                _animeId.intValue,
+                voiceModel.voiceGrupe,
+                indexSeries
+            )
+        }
     }
 }

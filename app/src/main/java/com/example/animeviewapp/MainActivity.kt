@@ -16,10 +16,12 @@ import com.example.animeviewapp.glue.home.navigate.AdapterHomeRoute
 import com.example.animeviewapp.glue.sign_forget_password.navigate.AdapterSignForgetPasswordRoute
 import com.example.animeviewapp.glue.sign_in.navigate.AdapterSignInRoute
 import com.example.animeviewapp.glue.sign_up.navigate.AdapterSignUpRoute
+import com.example.animeviewapp.glue.video_player.navigation.AdapterVideoPlayerRoute
 import com.example.animeviewapp.model.RouteScreen
 import com.example.core.ui.theme.AnimeViewAppTheme
 import com.example.details.navigation.routeScreenDetails
 import com.example.home.navigate.routeScreenHome
+import com.example.player.navigate.routeScreenVideoPlayer
 import com.example.sign_forget_password.navigate.routeScreenSingForgetPassword
 import com.example.sign_up.navigate.routeScreenSingUp
 import com.example.sing_in.navigate.routeScreenSingIn
@@ -44,6 +46,9 @@ class MainActivity @Inject constructor() : ComponentActivity() {
 
     @Inject
     lateinit var adapterDetailsRoute: AdapterDetailsRoute
+
+    @Inject
+    lateinit var adapterVideoPlayerRoute: AdapterVideoPlayerRoute
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -56,7 +61,11 @@ class MainActivity @Inject constructor() : ComponentActivity() {
                 adapterHomeRoute.setNavControl(navController)
                 adapterHomeRoute.setRouteDetails(RouteScreen.Details.route)
 
+
                 adapterDetailsRoute.setNavControl(navController)
+                adapterDetailsRoute.setRouteVideoPlayer(RouteScreen.RouteVideoPlayer.route)
+
+                adapterVideoPlayerRoute.setNavControl(navController)
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -84,6 +93,8 @@ class MainActivity @Inject constructor() : ComponentActivity() {
                         routeScreenHome(RouteScreen.SignHome.route)
 
                         routeScreenDetails(RouteScreen.Details.route)
+
+                        routeScreenVideoPlayer(RouteScreen.RouteVideoPlayer.route)
 
 
                     }

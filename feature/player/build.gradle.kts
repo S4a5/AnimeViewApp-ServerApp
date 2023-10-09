@@ -1,28 +1,19 @@
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
-
 plugins {
-    id ("com.google.dagger.hilt.android")
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    id("com.google.dagger.hilt.android")
+    id("com.android.library")
+    id("kotlin-android")
     kotlin("kapt")
 }
 
 android {
-    namespace = "com.example.animeviewapp"
+    namespace = "com.example.player"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.animeviewapp"
         minSdk = 27
-        //noinspection EditedTargetSdkVersion
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
-        compileSdkPreview = "UpsideDownCake"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
+//        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -47,12 +38,8 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
     }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
 }
+
 val navVersion: String by project
 val retrofitVersion: String by project
 
@@ -60,10 +47,10 @@ val ktxVersion: String by project
 val runtimeKtxVersion: String by project
 val activityComposeVersion: String by project
 val composeBomVersion: String by project
-kapt{
+kapt {
     correctErrorTypes = true
 }
-hilt{
+hilt {
     enableAggregatingTask = true
 }
 dependencies {
@@ -80,13 +67,10 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.test:monitor:1.6.1")
     implementation("androidx.test.ext:junit-ktx:1.1.5")
-    implementation(project(mapOf("path" to ":feature:sign-forget-password")))
-    implementation(project(mapOf("path" to ":feature:home")))
     debugImplementation("androidx.compose.ui:ui-tooling")
+
     implementation(project(":core"))
 
-    //Navigation
-    implementation("androidx.navigation:navigation-compose:$navVersion")
 
     //Hilt
     implementation("com.google.dagger:hilt-android:2.44")
@@ -98,17 +82,9 @@ dependencies {
 
     // Lifecycle
     val lifecycle_version = "2.6.0-alpha05"
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    implementation ("androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version")
-
-
-    implementation(project(":feature:sign-in"))
-    implementation(project(":feature:sign-up"))
-    implementation(project(":core"))
-    implementation(project(":data"))
-    implementation(project(":feature:details"))
-    implementation(project(":feature:player"))
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version")
 
     //Preview
     val composeBom = platform("androidx.compose:compose-bom:2023.08.00")
@@ -122,6 +98,15 @@ dependencies {
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
+    implementation("com.squareup.okhttp3:okhttp:4.0.0")
 
+    //Coil
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
+    // ExoPlayer
+//    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+
+    implementation("androidx.media3:media3-exoplayer:1.1.1")
+    implementation("androidx.media3:media3-exoplayer-dash:1.1.1")
+    implementation("androidx.media3:media3-ui:1.1.1")
 }

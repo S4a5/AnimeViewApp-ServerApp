@@ -10,4 +10,5 @@ sealed class RouteScreen(val route: String,@DrawableRes val icon:Int?=null,val t
     object SignForgetPassword : RouteScreen("sign_forget_password")
     object SignHome : RouteScreen("home",icon = R.drawable.ic_home,title = "Главная")
     object Details : RouteScreen("details")
+    object RouteVideoPlayer : RouteScreen("routeVideoPlayer")
 }

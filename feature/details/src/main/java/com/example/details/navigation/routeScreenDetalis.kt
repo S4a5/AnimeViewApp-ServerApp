@@ -17,8 +17,6 @@ fun NavGraphBuilder.routeScreenDetails(route: String) {
             ScreenDetails(it)
         }?: kotlin.run {
             Toast.makeText(LocalContext.current,"null animeId",Toast.LENGTH_LONG).show()
-            ScreenDetails(4333)
         }
-
     }
 }
