@@ -1,16 +1,15 @@
 package com.example.player
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,13 +27,10 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
-import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,33 +38,27 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.example.core.ui.theme.AnimeViewAppTheme
+import com.example.core.ui.theme.Gray_4
+import com.example.player.data.model.Definition
 import kotlinx.coroutines.delay
 
 @Composable
 fun CustomVideoController(
     player: ExoPlayer,
     modifier: Modifier = Modifier,
-    isStartVisibleController: Boolean
+    viewModelVideoPlayer: ViewModelVideoPlayer
 ) {
     val viewModel = hiltViewModel<ViewModelController>()
-
-    val playbackState by rememberUpdatedState(newValue = player)
     val isPlaying by viewModel.isPlaying.collectAsState()
     val isVisibleController by viewModel.isVisible.collectAsState()
-
 
 
     LaunchedEffect(key1 = null) {
@@ -163,8 +153,11 @@ fun CustomVideoController(
                         viewModel.setVisibleController()
                         val float = (it.toFloat()) * (max.longValue.toFloat())
                         player.seekTo(float.toLong())
-
                     },
+                    colors = SliderDefaults.colors(
+                        disabledActiveTrackColor = Gray_4,
+                        inactiveTrackColor = Gray_4
+                    )
                 )
 
                 // Текст с текущим временем/длительностью
@@ -174,31 +167,49 @@ fun CustomVideoController(
                 )
             }
         }
-        ViewVoice(modifier = Modifier.background(Color.White))
+        AnimatedVisibility(
+            visible = isVisibleController,
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                ViewVoice(
+                    modifier = Modifier,
+                    viewModelVideoPlayer,
+                )
+                ViewEpisode(
+                    modifier = Modifier,
+                    viewModelVideoPlayer,
+                )
+            }
+        }
+        AnimatedVisibility(
+            visible = isVisibleController,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+            modifier = Modifier.align(Alignment.BottomEnd)
+        ) {
+            ViewDefinition(
+                modifier = Modifier,
+                viewModelVideoPlayer,
+            )
+        }
     }
 
 }
-
-@Preview
-@Composable
-fun PreviewViewVoice() {
-    AnimeViewAppTheme {
-        ViewVoice(Modifier)
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ViewVoice(modifier: Modifier) {
-    val coffeeDrinks = arrayOf("Americano", "Cappuccino", "Espresso", "Latte", "Mocha")
+fun ViewVoice(
+    modifier: Modifier,
+    viewModelVideoPlayer: ViewModelVideoPlayer,
+) {
+    val listVoice by viewModelVideoPlayer.listVoice.collectAsState()
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(coffeeDrinks[0]) }
+    val selectedText by viewModelVideoPlayer.selectVoice.collectAsState()
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(32.dp)
+        modifier = modifier
     ) {
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -210,13 +221,78 @@ fun ViewVoice(modifier: Modifier) {
                 modifier = Modifier
                     .menuAnchor()
                     .background(
-                        MaterialTheme.colorScheme.background,
+                        Gray_4,
                         RoundedCornerShape(4.dp)
-                    )
-                    .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
-                    , verticalAlignment = Alignment.CenterVertically
+                    ),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = selectedText, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary,modifier = Modifier.padding(4.dp))
+                Text(
+                    text = selectedText ?: "ERROR",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color.White,
+                    modifier = Modifier.padding(4.dp),
+                    textAlign = TextAlign.Center
+                )
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            }
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Gray_4)
+            ) {
+                listVoice.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item, color = Color.White) },
+                        onClick = {
+                            viewModelVideoPlayer.setSelectVoice(item)
+                            expanded = false
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ViewEpisode(
+    modifier: Modifier,
+    viewModelVideoPlayer: ViewModelVideoPlayer,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    val listSeriesCurrentVoice by viewModelVideoPlayer.listSeriesCurrentVoice.collectAsState()
+
+    val currentEpisodeSeriesModel by viewModelVideoPlayer.currentEpisodeSeriesModel.collectAsState()
+
+
+    Box(
+        modifier = modifier
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            Row(
+                modifier = Modifier
+                    .menuAnchor()
+                    .background(
+                        Gray_4,
+                        RoundedCornerShape(4.dp)
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = currentEpisodeSeriesModel?.name ?: "ERROR",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color.White,
+                    modifier = Modifier.padding(4.dp),
+                    textAlign = TextAlign.Center
+                )
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             }
 
@@ -231,23 +307,109 @@ fun ViewVoice(modifier: Modifier) {
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-
+                modifier = Modifier.background(Gray_4)
             ) {
-                coffeeDrinks.forEach { item ->
+                listSeriesCurrentVoice.forEach { item ->
                     DropdownMenuItem(
-                        text = { Text(text = item) },
+                        text = { Text(text = item.name?:"null", color = Color.White) },
                         onClick = {
-                            selectedText = item
+                            viewModelVideoPlayer.setSelectEpisode(item.id)
                             expanded = false
                         },
-                        colors = MenuDefaults.itemColors(
-                            textColor = MaterialTheme.colorScheme.primary,
-                            leadingIconColor = MaterialTheme.colorScheme.primary,
-                            trailingIconColor = MaterialTheme.colorScheme.primary
-                        )
                     )
                 }
             }
+
+        }
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ViewDefinition(
+    modifier: Modifier,
+    viewModelVideoPlayer: ViewModelVideoPlayer,
+) {
+    val listSeriesCurrentVoice by viewModelVideoPlayer.listSeriesCurrentVoice.collectAsState()
+
+    var expanded by remember { mutableStateOf(false) }
+    val selectEpisode by viewModelVideoPlayer.selectEpisodeId.collectAsState()
+    val currentEpisodeSeriesModel by viewModelVideoPlayer.currentEpisodeSeriesModel.collectAsState()
+    val currentDefinition by viewModelVideoPlayer.currentDefinition.collectAsState()
+    Box(
+        modifier = modifier
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            Row(
+                modifier = Modifier
+                    .menuAnchor()
+                    .background(
+                        Gray_4,
+                        RoundedCornerShape(4.dp)
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = when(currentDefinition){
+                        is Definition.FHD -> "FHD"
+                        is Definition.HD -> "HD"
+                        is Definition.SD -> "SD"
+                        null -> "null"
+                    },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color.White,
+                    modifier = Modifier.padding(4.dp),
+                    textAlign = TextAlign.Center
+                )
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            }
+            val fhd by remember {
+                mutableStateOf(currentEpisodeSeriesModel?.fhd)
+            }
+            val hd by remember {
+                mutableStateOf(currentEpisodeSeriesModel?.hd)
+            }
+            val std by remember {
+                mutableStateOf(currentEpisodeSeriesModel?.std)
+            }
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Gray_4)
+            ) {
+                if (fhd != null){
+                    DropdownMenuItem(
+                        text = { Text(text = "FHD", color = Color.White) },
+                        onClick = {
+                            viewModelVideoPlayer.setSelectDefinition(Definition.FHD(fhd?:"null"))
+                            expanded = false
+                        },
+                    )
+                }
+                if (hd != null){
+                    DropdownMenuItem(
+                        text = { Text(text = "HD", color = Color.White) },
+                        onClick = {
+                            viewModelVideoPlayer.setSelectDefinition(Definition.HD(hd?:"null"))
+                            expanded = false
+                        },
+                    )
+                }
+                if (std != null){
+                    DropdownMenuItem(
+                        text = { Text(text = "STD", color = Color.White) },
+                        onClick = {
+                            viewModelVideoPlayer.setSelectDefinition(Definition.SD(std?:"null"))
+                            expanded = false
+                        },
+                    )
+                }
+            }
+
         }
     }
 }

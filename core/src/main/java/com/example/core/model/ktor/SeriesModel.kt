@@ -1,7 +1,7 @@
 package com.example.core.model.ktor
 
 data class SeriesModel(
-    val id: Int? = null,
+    val id: Int,
     val voice_id: Int = -1,
     val name: String?,
     val preview: String?,

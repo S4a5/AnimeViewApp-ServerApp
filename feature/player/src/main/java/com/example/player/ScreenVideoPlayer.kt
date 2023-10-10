@@ -10,17 +10,13 @@ import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,10 +31,8 @@ import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerView
-import com.example.core.model.ktor.SeriesModel
 import com.example.player.CustomVideoController
 import com.example.player.ViewModelVideoPlayer
-import com.example.player.data.model.Definition
 
 
 @Composable
@@ -46,14 +40,17 @@ fun ScreenVideoPlayer(id: Int, voice: String, episode: Int) {
     val activity = LocalContext.current as Activity
     val color = MaterialTheme.colorScheme.primary
     val viewModel = hiltViewModel<ViewModelVideoPlayer>()
-    viewModel.setArgument(id, voice, episode)
+    LaunchedEffect(key1 = Unit){
+        viewModel.setArgument(id, voice, episode)
+    }
 
-    val currentEpisodeUrl by viewModel.currentEpisodeUrl.collectAsState()
-    val listSeriesCurrentVoice by viewModel.listSeriesCurrentVoice.collectAsState()
+
+    val currentEpisodeUrl by viewModel.currentEpisodeSeriesModel.collectAsState()
+
 
     if (currentEpisodeUrl != null) {
         Log.d("qqqqqqqqq2", currentEpisodeUrl.toString())
-        VideoPlayer(listSeriesCurrentVoice, viewModel)
+        VideoPlayer( viewModel)
     }
 
 
@@ -71,39 +68,31 @@ fun ScreenVideoPlayer(id: Int, voice: String, episode: Int) {
 @SuppressLint("OpaqueUnitKey")
 @Composable
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-fun VideoPlayer(sourceUrl: List<SeriesModel>, viewModel: ViewModelVideoPlayer) {
-
+fun VideoPlayer( viewModel: ViewModelVideoPlayer) {
+    val listSeriesCurrentVoice by viewModel.listSeriesCurrentVoice.collectAsState()
+    val currentEpisodeSeriesModel by viewModel.currentEpisodeSeriesModel.collectAsState()
     val context = LocalContext.current
-    val definition by viewModel.definition.collectAsState()
+    val definition by viewModel.currentDefinition.collectAsState()
     val exoPlayer = remember {
-        ExoPlayer.Builder(context)
-            .build()
-            .apply {
-                val defaultDataSourceFactory = DefaultDataSource.Factory(context)
-                val dataSourceFactory: DataSource.Factory = DefaultDataSource.Factory(
-                    context,
-                    defaultDataSourceFactory
-                )
-                val listSource = sourceUrl.map {
-
-                    val url = when (val result = definition) {
-                        is Definition.FHD -> MediaItem.fromUri(result.url)
-                        is Definition.HD -> MediaItem.fromUri(result.url)
-                        is Definition.SD -> MediaItem.fromUri(result.url)
-                        null -> TODO()
-                    }
-                    ProgressiveMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(url)
-                }
-
-                setMediaSources(listSource)
-                prepare()
-            }
+        ExoPlayer.Builder(context).build().apply {
+            playWhenReady = false
+            videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
+            repeatMode = Player.REPEAT_MODE_ONE
+        }
     }
 
-    exoPlayer.playWhenReady = false
-    exoPlayer.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
-    exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
+    LaunchedEffect(key1 = definition){
+        val defaultDataSourceFactory = DefaultDataSource.Factory(context)
+        val dataSourceFactory: DataSource.Factory = DefaultDataSource.Factory(
+            context,
+            defaultDataSourceFactory
+        )
+        exoPlayer.setMediaSource( ProgressiveMediaSource.Factory(dataSourceFactory)
+            .createMediaSource(MediaItem.fromUri(definition?.url!!)))
+
+        exoPlayer.prepare()
+    }
+
 
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -132,7 +121,8 @@ fun VideoPlayer(sourceUrl: List<SeriesModel>, viewModel: ViewModelVideoPlayer) {
         CustomVideoController(
             exoPlayer, modifier = Modifier
                 .fillMaxSize(0.95f)
-                .align(Alignment.Center), true
+                .align(Alignment.Center),
+            viewModel
         )
     }
 

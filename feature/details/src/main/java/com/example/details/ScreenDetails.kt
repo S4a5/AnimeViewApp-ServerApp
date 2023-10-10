@@ -372,7 +372,7 @@ private fun ItemSeries(it: SeriesModel, viewModel: ViewModelDetails,index:Int) {
         modifier = Modifier
             .clip(RoundedCornerShape(10.dp))
             .clickable {
-                viewModel.onClickSeries(it,index)
+                viewModel.onClickSeries(it,it.id)
             }) {
         val request: ImageRequest = ImageRequest.Builder(LocalContext.current.applicationContext)
             .data(it.preview)

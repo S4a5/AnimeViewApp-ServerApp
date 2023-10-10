@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.example.core.model.VoiceModel
+import com.example.player.data.GetAnimeByIdRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -29,7 +31,6 @@ class ViewModelController @Inject constructor() : ViewModel() {
 
     private val _exoPlayer = MutableStateFlow<ExoPlayer?>(null)
 
-    private val _isLoading = MutableStateFlow<Boolean>(true)
     init {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
