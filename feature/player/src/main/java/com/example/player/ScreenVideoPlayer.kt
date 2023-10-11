@@ -29,6 +29,9 @@ import androidx.media3.common.Player
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.ConcatenatingMediaSource
+import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerView
 import com.example.player.CustomVideoController
@@ -87,8 +90,27 @@ fun VideoPlayer( viewModel: ViewModelVideoPlayer) {
             context,
             defaultDataSourceFactory
         )
-        exoPlayer.setMediaSource( ProgressiveMediaSource.Factory(dataSourceFactory)
+        exoPlayer.setMediaSource( HlsMediaSource.Factory(dataSourceFactory)
             .createMediaSource(MediaItem.fromUri(definition?.url!!)))
+
+//        Log.d("qqqqqqqqqq255",)
+
+        if (definition?.url?.split(".")?.last() == "mp4"){
+            val progressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(definition?.url!!))
+
+            exoPlayer.setMediaSource(progressiveMediaSource)
+        }else{
+            val hlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(definition?.url!!))
+
+            exoPlayer.setMediaSource(hlsMediaSource)
+        }
+
+
+        // Установка MediaSource в ExoPlayer
+
+//        exoPlayer.prepare(mediaSource)
 
         exoPlayer.prepare()
     }

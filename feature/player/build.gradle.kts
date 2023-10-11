@@ -67,6 +67,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.test:monitor:1.6.1")
     implementation("androidx.test.ext:junit-ktx:1.1.5")
+    implementation("androidx.media3:media3-exoplayer-hls:1.1.1")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     implementation(project(":core"))

@@ -10,7 +10,7 @@ data class VoiceModel(
     var urlImagePreview: String?,
     val screenImage: String?,
     val seriesCount: Int?,
-    val last_change: Int?,
+    val last_change: Long?,
     val updated: Int?,
 ) {
     fun selectAnime(animeId: Int) {
