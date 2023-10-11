@@ -16,7 +16,7 @@ class LastDataCache @Inject constructor(private val ktorService: KtorService) {
     val lastAnimeFlow = _lastAnimeFlow.asStateFlow()
 
     private var page = 1
-    private val quantity = 10
+    private val quantity = 5
 
     suspend fun requestNewAnime() {
         val response = ktorService.getPageAnime(page, quantity)
@@ -25,6 +25,7 @@ class LastDataCache @Inject constructor(private val ktorService: KtorService) {
             if (body != null) {
                 _lastAnimeFlow.emit(_lastAnimeFlow.value + body)
                 page++
+                Log.d("qqqqqqqqqq",_lastAnimeFlow.value.size.toString())
                 return
             }
         } else {
@@ -36,7 +37,13 @@ class LastDataCache @Inject constructor(private val ktorService: KtorService) {
         throw Throwable("no information about the problem")
     }
     fun getAnimeById(animeId:Int):AnimeDetails{
-        val animeDetails = _lastAnimeFlow.value.find { it.voiceModels.first().anime_id == animeId }
+        val animeDetails = _lastAnimeFlow.value.find {
+            Log.d("qqqqqqqqqq",it.voiceModels.first().anime_id.toString())
+            Log.d("qqqqqqqqqq",animeId.toString())
+            Log.d("qqqqqqqqqq","-----------------------")
+
+            it.voiceModels.first().anime_id == animeId
+        }
             return animeDetails ?: throw Throwable("no anime found by id")
     }
 }

@@ -1,5 +1,6 @@
 package com.example.details
 
+import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -76,6 +77,7 @@ class ViewModelDetails @Inject constructor(
 
     fun setAnimeId(animeId: Int) {
         viewModelScope.launch {
+            Log.d("animeId11111",animeId.toString())
             _anime.emit(getAnimeByIdRepository.getAnimeByIdRepository(animeId))
             setSelectViewVoice(0)
             _animeId.intValue = animeId

@@ -1,5 +1,6 @@
 package com.example.data.use_case
 
+import android.util.Log
 import com.example.core.model.ktor.AnimeDetails
 import com.example.data.KtorService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +30,8 @@ class SearchDataCache @Inject constructor(private val ktorService: KtorService) 
         throw Throwable("no information about the problem")
     }
     fun getAnimeById(animeId:Int):AnimeDetails{
-        val animeDetails = _searchAnimeFlow.value.find { it.voiceModels.first().anime_id == animeId }
+        val animeDetails = _searchAnimeFlow.value.find {
+            it.voiceModels.first().anime_id == animeId }
         return animeDetails ?: throw Throwable("no anime found by id")
     }
 }
