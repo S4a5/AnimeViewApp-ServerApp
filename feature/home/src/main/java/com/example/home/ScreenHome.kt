@@ -155,16 +155,16 @@ fun Content(viewModelHome: ViewModelHome) {
 
                 }
 
-//                LaunchedEffect(lazyState) {
-//                    snapshotFlow { lazyState.layoutInfo }
-//                        .collect {
-//                            val lastVisibleItem =
-//                                lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-//                            if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
-//                                viewModelHome.avtoLoadAnime()
-//                            }
-//                        }
-//                }
+                LaunchedEffect(lazyState) {
+                    snapshotFlow { lazyState.layoutInfo }
+                        .collect {
+                            val lastVisibleItem =
+                                lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                            if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
+                                viewModelHome.avtoLoadAnime()
+                            }
+                        }
+                }
 
             }
 
