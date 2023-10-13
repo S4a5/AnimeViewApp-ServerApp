@@ -8,17 +8,18 @@ plugins {
 }
 
 android {
-    namespace = "com.example.animeviewapp"
+    namespace = "com.s4a4.animeviewapp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.animeviewapp"
+        applicationId = "com.s4a4.animeviewapp"
         minSdk = 26
         //noinspection EditedTargetSdkVersion
+
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-        compileSdkPreview = "UpsideDownCake"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true

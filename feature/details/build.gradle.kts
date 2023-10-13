@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.details"
+    namespace = "com.s4a4.details"
     compileSdk = 34
 
     defaultConfig {

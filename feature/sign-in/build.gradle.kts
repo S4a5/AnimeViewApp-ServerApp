@@ -8,12 +8,12 @@ plugins {
 }
 
 android {
-    namespace = "com.example.sing_in"
+    namespace = "com.s4a4.sing_in"
     compileSdk = 34
 
     defaultConfig {
         minSdk = 26
-        compileSdkPreview = "UpsideDownCake"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }

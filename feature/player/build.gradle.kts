@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.player"
+    namespace = "com.s4a4.player"
     compileSdk = 34
 
     defaultConfig {

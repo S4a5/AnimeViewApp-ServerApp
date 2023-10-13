@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.core"
+    namespace = "com.s4a4.core"
     compileSdk = 33
 
     defaultConfig {

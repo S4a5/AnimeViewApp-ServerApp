@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
-
 plugins {
     id ("com.google.dagger.hilt.android")
     id ("com.android.library")
@@ -8,12 +6,12 @@ plugins {
 }
 
 android {
-    namespace = "com.example.sign_forget_password"
+    namespace = "com.s4a4.sign_forget_password"
     compileSdk = 34
 
     defaultConfig {
         minSdk = 26
-        compileSdkPreview = "UpsideDownCake"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 //        consumerProguardFiles("consumer-rules.pro")
     }
