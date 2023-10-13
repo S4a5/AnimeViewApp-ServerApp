@@ -3,6 +3,7 @@ package com.s4a4.data
 import com.s4a4.core.model.anime_vost.AnimeVostModel
 import com.s4a4.core.model.ktor.AnimeDetails
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -18,4 +19,10 @@ interface KtorService {
     suspend fun getAnimeByName(
         @Query("search") search: String,
     ): Response<List<AnimeDetails>>
+
+    @GET("genres")
+    suspend fun getAllGenres(): Response<List<String>>
+
+    @POST("genres")
+    suspend fun getAnimeByGenre(@Body list: List<String>): Response<List<AnimeDetails>>
 }

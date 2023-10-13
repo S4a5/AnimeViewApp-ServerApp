@@ -72,7 +72,7 @@ fun ScreenHome(
     ) {
         Search(viewModelHome)
 
-//        RowGenre(viewModelHome)
+        RowGenre(viewModelHome)
 
         Content(viewModelHome)
 
@@ -113,7 +113,7 @@ fun Content(viewModelHome: ViewModelHome) {
 
             }
 
-            stateUi is StateUi.Success || listAnime.isNotEmpty()-> {
+            stateUi is StateUi.Success || listAnime.isNotEmpty() -> {
                 val lazyState = rememberLazyListState()
                 if (listAnime.isNotEmpty()) {
                     LazyColumn(
@@ -259,26 +259,7 @@ private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
                             .size(20.dp)
                             .clip(RoundedCornerShape(10.dp))
                     )
-
-
                 }
-//                for (model in data.voiceModels) {
-//                    if (model.voiceGrupe == "anime_vost") {
-//                        Image(
-//                            painter = painterResource(com.s4a4.core.R.drawable.anime_vost),
-//                            contentDescription = "",
-//                            modifier = Modifier.size(20.dp)
-//                        )
-//                    }
-//                    if (model.voiceGrupe == "anilibria") {
-//                        Image(
-//                            painter = painterResource(com.s4a4.core.R.drawable.anilibria),
-//                            contentDescription = "",
-//                            modifier = Modifier.size(20.dp)
-//                        )
-//                    }
-//
-//                }
             }
         }
 
@@ -346,64 +327,59 @@ fun RowGenre(viewModelHome: ViewModelHome) {
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     val sortData =
-                        data.entries.sortedByDescending { isSelect.find { a -> it.key == a } != null }
+                        data.sortedByDescending { isSelect.find { a -> it == a } != null }
 
-                    for ((key, value) in sortData) {
-
-                        if (key.toInt() <= 29) {
-                            item() {
-                                if (isSelect.find { it == key } != null) {
-                                    Box(
-                                        modifier = Modifier
-                                            .height(30.dp)
-                                            .padding(horizontal = 0.dp)
-                                            .border(
-                                                1.dp, MaterialTheme.colorScheme.primary,
-                                                RoundedCornerShape(20.dp)
-                                            )
-                                            .background(
-                                                MaterialTheme.colorScheme.primary,
-                                                RoundedCornerShape(20.dp)
-                                            )
-                                            .clickable {
-                                                viewModelHome.onClickGenre(key)
-                                            },
-                                        contentAlignment = Alignment.Center,
+                    items(sortData) { value ->
+                        if (isSelect.find { it == value } != null) {
+                            Box(
+                                modifier = Modifier
+                                    .height(30.dp)
+                                    .padding(horizontal = 0.dp)
+                                    .border(
+                                        1.dp, MaterialTheme.colorScheme.primary,
+                                        RoundedCornerShape(20.dp)
                                     )
-                                    {
-                                        Text(
-                                            text = value,
-                                            modifier = Modifier.padding(horizontal = 10.dp),
-                                            color = MaterialTheme.colorScheme.background
-                                        )
-                                    }
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .height(30.dp)
-                                            .padding(horizontal = 0.dp)
-                                            .border(
-                                                1.dp, MaterialTheme.colorScheme.secondaryContainer,
-                                                RoundedCornerShape(20.dp)
-                                            )
-                                            .background(
-                                                MaterialTheme.colorScheme.secondary,
-                                                RoundedCornerShape(20.dp)
-                                            )
-                                            .clickable {
-                                                viewModelHome.onClickGenre(key)
-                                            },
-                                        contentAlignment = Alignment.Center,
+                                    .background(
+                                        MaterialTheme.colorScheme.primary,
+                                        RoundedCornerShape(20.dp)
                                     )
-                                    {
+                                    .clickable {
+                                        viewModelHome.onClickGenre(value)
+                                    },
+                                contentAlignment = Alignment.Center,
+                            )
+                            {
+                                Text(
+                                    text = value,
+                                    modifier = Modifier.padding(horizontal = 10.dp),
+                                    color = MaterialTheme.colorScheme.background
+                                )
+                            }
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .height(30.dp)
+                                    .padding(horizontal = 0.dp)
+                                    .border(
+                                        1.dp, MaterialTheme.colorScheme.secondaryContainer,
+                                        RoundedCornerShape(20.dp)
+                                    )
+                                    .background(
+                                        MaterialTheme.colorScheme.secondary,
+                                        RoundedCornerShape(20.dp)
+                                    )
+                                    .clickable {
+                                        viewModelHome.onClickGenre(value)
+                                    },
+                                contentAlignment = Alignment.Center,
+                            )
+                            {
 
-                                        Text(
-                                            text = value,
-                                            modifier = Modifier.padding(horizontal = 10.dp),
-                                            color = MaterialTheme.colorScheme.secondaryContainer
-                                        )
-                                    }
-                                }
+                                Text(
+                                    text = value,
+                                    modifier = Modifier.padding(horizontal = 10.dp),
+                                    color = MaterialTheme.colorScheme.secondaryContainer
+                                )
                             }
                         }
                     }
