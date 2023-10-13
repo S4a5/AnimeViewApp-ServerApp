@@ -23,6 +23,6 @@ interface KtorService {
     @GET("genres")
     suspend fun getAllGenres(): Response<List<String>>
 
-    @POST("genres")
+    @POST("/search/by/genres")
     suspend fun getAnimeByGenre(@Body list: List<String>): Response<List<AnimeDetails>>
 }

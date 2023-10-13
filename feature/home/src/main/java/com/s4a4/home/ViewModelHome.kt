@@ -32,7 +32,6 @@ class ViewModelHome @Inject constructor(
 
 
     private val _listAnimeByGenres = MutableStateFlow<List<AnimeDetails>>(emptyList())
-    val listAnimeByGenres = _listAnimeByGenres.asStateFlow()
 
     private val _stateUi = MutableStateFlow<StateUi<Nothing>>(StateUi.Loader)
     val stateUi = _stateUi.asStateFlow()
@@ -49,8 +48,8 @@ class ViewModelHome @Inject constructor(
     private val _genre = MutableStateFlow<StateUi<List<String>>>(StateUi.Loader)
     val genre = _genre.asStateFlow()
 
-    private val _selectGenre = mutableStateListOf<String>()
-    val selectGenre: List<String> = _selectGenre
+    private val _selectGenre = MutableStateFlow(mutableStateListOf<String>())
+    val selectGenre = _selectGenre.asStateFlow()
 
     init {
         genresRepository.listGenres.onEach {
@@ -58,14 +57,14 @@ class ViewModelHome @Inject constructor(
         }.launchIn(viewModelScope)
         viewModelScope.launch {
             getData()
-            combine(list, searchList, _searchQuery,listAnimeByGenres) { lastAnime, searchAnime, searchQuery,listAnimeByGenres ->
+            combine(list, searchList, _searchQuery,_listAnimeByGenres,_selectGenre) { lastAnime, searchAnime, searchQuery,listAnimeByGenres,selectGenre ->
                 val searchQueryTrim = searchQuery.trim()
 
                 when{
                     searchQueryTrim.isNotBlank() && searchQueryTrim.length >= MIN_LENGHT_SEARCH ->{
                         _viewList.emit(value = searchAnime)
                     }
-                    listAnimeByGenres.isNotEmpty() ->{
+                    selectGenre.isNotEmpty() ->{
                         _viewList.emit(value = listAnimeByGenres)
                     }
                     searchQueryTrim.isBlank() ->{
@@ -98,11 +97,11 @@ class ViewModelHome @Inject constructor(
     }
 
     fun onClickGenre(key: String) {
-        if (!_selectGenre.remove(key)) {
-            _selectGenre.add(key)
+        if (!_selectGenre.value .remove(key)) {
+            _selectGenre.value.add(key)
         }
         viewModelScope.launch {
-            val response = genresRepository.getAnimeByGenres(_selectGenre)
+            val response = genresRepository.getAnimeByGenres(_selectGenre.value)
             if (response.isSuccessful){
                 response.body()?.let {
                     _listAnimeByGenres.emit(it)

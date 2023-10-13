@@ -181,6 +181,7 @@ fun Content(viewModelHome: ViewModelHome) {
 
 @Composable
 private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
+    Log.d("qqqqwwwwwwweeee", data.nameModels.size.toString())
     val nameModels = data.nameModels.firstOrNull() ?: return
     val voiceModels = data.voiceModels.firstOrNull() ?: return
 
@@ -242,6 +243,13 @@ private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
 //                style = MaterialTheme.typography.labelMedium,
 //                textAlign = TextAlign.Center,
 //            )
+            if (voiceModels.genre != null) {
+                Text(
+                    text = voiceModels.genre.toString()?:"NULL",
+                    style = MaterialTheme.typography.labelMedium,
+                    textAlign = TextAlign.Center,
+                )
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -311,7 +319,7 @@ fun Search(viewModelHome: ViewModelHome) {
 fun RowGenre(viewModelHome: ViewModelHome) {
     val display = (LocalContext.current.resources.displayMetrics.xdpi * 0.05).toInt()
     val genre by viewModelHome.genre.collectAsState()
-    val isSelect = viewModelHome.selectGenre
+    val isSelect by viewModelHome.selectGenre.collectAsState()
 
     when (val result = genre) {
         StateUi.Loader -> {
