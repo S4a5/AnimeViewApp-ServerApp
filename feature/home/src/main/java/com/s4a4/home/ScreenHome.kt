@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -124,8 +125,9 @@ fun Content(viewModelHome: ViewModelHome) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
 
-                        items(listAnime) {
-                            Items(it, viewModelHome)
+                        itemsIndexed(listAnime) {index,data->
+
+                            Items(data, viewModelHome)
                         }
 
                         if (progress is StateUi.Loader) {
@@ -160,6 +162,7 @@ fun Content(viewModelHome: ViewModelHome) {
                 LaunchedEffect(lazyState) {
                     snapshotFlow { lazyState.layoutInfo }
                         .collect {
+                            Log.d("qweqwrqwrq",lazyState.firstVisibleItemIndex .toString())
                             val lastVisibleItem =
                                 lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
                             if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
@@ -181,9 +184,10 @@ fun Content(viewModelHome: ViewModelHome) {
 
 @Composable
 private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
+
     Log.d("qqqqwwwwwwweeee", data.nameModels.size.toString())
-    val nameModels = data.nameModels.firstOrNull() ?: return
-    val voiceModels = data.voiceModels.firstOrNull() ?: return
+    val nameModels = data.nameModels.first()
+    val voiceModels = data.voiceModels.first()
 
     Row(
         modifier = Modifier
