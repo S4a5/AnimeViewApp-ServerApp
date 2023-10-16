@@ -16,7 +16,7 @@ class LastDataCache @Inject constructor(private val ktorService: KtorService) {
     val lastAnimeFlow = _lastAnimeFlow.asStateFlow()
 
     private var page = 1
-    private val quantity = 5
+    private val quantity = 10
 
     suspend fun requestNewAnime() {
         val response = ktorService.getPageAnime(page, quantity)
