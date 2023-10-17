@@ -125,7 +125,7 @@ fun Content(viewModelHome: ViewModelHome) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
 
-                        itemsIndexed(listAnime) {index,data->
+                        itemsIndexed(listAnime) { index, data ->
 
                             Items(data, viewModelHome)
                         }
@@ -162,7 +162,7 @@ fun Content(viewModelHome: ViewModelHome) {
                 LaunchedEffect(lazyState) {
                     snapshotFlow { lazyState.layoutInfo }
                         .collect {
-                            Log.d("qweqwrqwrq",lazyState.firstVisibleItemIndex .toString())
+                            Log.d("qweqwrqwrq", lazyState.firstVisibleItemIndex.toString())
                             val lastVisibleItem =
                                 lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
                             if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
@@ -227,8 +227,19 @@ private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
         ) {
             val title = nameModels.ru!!
 
+            val part = if (nameModels.part != null){
+                ("Часть " + nameModels.part) ?: ""
+            }else{
+                ""
+            }
+            val season = if (nameModels.season != null){
+                (" " + nameModels.season) ?: ""
+            }else{
+                ""
+            }
+
             Text(
-                text = title,
+                text = title + season + part,
                 modifier = Modifier.fillMaxWidth(0.9f),
                 style = MaterialTheme.typography.titleSmall,
                 textAlign = TextAlign.Center,
@@ -249,7 +260,7 @@ private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
 //            )
             if (voiceModels.genre != null) {
                 Text(
-                    text = voiceModels.genre.toString()?:"NULL",
+                    text = voiceModels.genre.toString() ?: "NULL",
                     style = MaterialTheme.typography.labelMedium,
                     textAlign = TextAlign.Center,
                 )
