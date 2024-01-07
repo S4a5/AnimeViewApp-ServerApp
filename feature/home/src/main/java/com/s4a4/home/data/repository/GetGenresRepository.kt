@@ -9,4 +9,5 @@ interface GenresRepository {
     val listGenres:StateFlow<List<String>>
 
     suspend fun getAnimeByGenres(list: List<String>): Response<List<AnimeDetails>>
+    fun loadGenreData()
 }

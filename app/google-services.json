@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "191111520007",
+    "project_id": "echoanime",
+    "storage_bucket": "echoanime.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:191111520007:android:f68d91cd06324d10c4efa2",
+        "android_client_info": {
+          "package_name": "com.s4a4.animeviewapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfaBKqLr8khmDp6tDtS2TVq1orLJlRd0o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

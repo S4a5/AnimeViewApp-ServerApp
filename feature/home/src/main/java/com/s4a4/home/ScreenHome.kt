@@ -2,7 +2,6 @@ package com.s4a4.home
 
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,8 +24,13 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,15 +39,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -59,6 +61,7 @@ import com.s4a4.core.model.StateUi
 import com.s4a4.core.model.ktor.AnimeDetails
 import com.s4a4.core.ui.theme.AnimeViewAppTheme
 import com.s4a4.core.ui.theme.ThemeBox
+import kotlinx.coroutines.launch
 
 @Composable
 fun ScreenHome(
@@ -80,6 +83,7 @@ fun ScreenHome(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Content(viewModelHome: ViewModelHome) {
     Column(
@@ -87,68 +91,128 @@ fun Content(viewModelHome: ViewModelHome) {
         verticalArrangement = Arrangement.Center
     ) {
         val stateUi by viewModelHome.stateUi.collectAsState()
+        val reFreshStateUi by viewModelHome.reFreshStateUi.collectAsState()
         val listAnime by viewModelHome.viewList.collectAsState()
         val progress by viewModelHome.progressNewAnime.collectAsState()
 
-        when {
-            stateUi is StateUi.Failed && listAnime.isEmpty() -> {
+        when (val state = stateUi) {
+            is StateUi.Failed -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = (stateUi as StateUi.Failed).error ?: "qqqq",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(
+                            painter = painterResource(id = R.drawable.error_500),
+                            contentDescription = "",
+                            modifier = Modifier.fillMaxWidth(),
+                            contentScale = ContentScale.FillWidth
+                        )
+                        Button(
+                            onClick = {
+                                viewModelHome.getData()
+                            },
+                            modifier = Modifier
+                                .clip(MaterialTheme.shapes.extraSmall),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text(
+                                text = "Переподключение",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
 
-            stateUi is StateUi.Loader -> {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxSize(0.5f)
-                            .align(Alignment.Center),
-                        strokeWidth = 6.dp
-                    )
-                }
-
-            }
-
-            stateUi is StateUi.Success || listAnime.isNotEmpty() -> {
-                val lazyState = rememberLazyListState()
-                if (listAnime.isNotEmpty()) {
-                    LazyColumn(
-                        state = lazyState,
-                        modifier = Modifier
-                            .fillMaxWidth(0.9f),
-                        contentPadding = PaddingValues(vertical = 10.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-
-                        itemsIndexed(listAnime) { index, data ->
-
-                            Items(data, viewModelHome)
-                        }
-
-                        if (progress is StateUi.Loader) {
-                            item {
-
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .size(50.dp)
-                                        .fillMaxWidth(),
-                                    strokeWidth = 6.dp
                                 )
-
-                            }
                         }
                     }
+
+                }
+            }
+
+            is StateUi.Success -> {
+                val lazyState = rememberLazyListState()
+                if (listAnime.isNotEmpty()) {
+                    val refreshScope = rememberCoroutineScope()
+
+                    fun refresh() = refreshScope.launch {
+                        viewModelHome.refreshData()
+                    }
+
+                    val pullRefreshState =
+                        rememberPullRefreshState(
+                            refreshing = reFreshStateUi is StateUi.Loader,
+                            onRefresh = { refresh() })
+                    Box(Modifier.pullRefresh(pullRefreshState)) {
+
+                        LazyColumn(
+                            state = lazyState,
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f),
+                            contentPadding = PaddingValues(vertical = 10.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+
+                            itemsIndexed(listAnime) { index, data ->
+
+                                Items(data, viewModelHome)
+                            }
+                            when (progress) {
+                                is StateUi.Failed -> {
+                                    item {
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                            Text(text = "Нет подключение к серверу")
+                                            Button(
+                                                onClick = {
+                                                    viewModelHome.avtoLoadAnime()
+                                                },
+                                                modifier = Modifier
+                                                    .clip(MaterialTheme.shapes.extraSmall),
+                                                shape = MaterialTheme.shapes.medium
+                                            ) {
+                                                Text(
+                                                    text = "Повторить попытку",
+                                                    style = MaterialTheme.typography.titleSmall,
+                                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+
+                                                    )
+                                            }
+                                        }
+
+                                    }
+
+                                }
+                                StateUi.Loader -> {
+                                    item {
+
+                                        CircularProgressIndicator(
+                                            modifier = Modifier
+                                                .size(50.dp)
+                                                .fillMaxWidth(),
+                                            strokeWidth = 6.dp
+                                        )
+
+                                    }
+                                }
+
+                                is StateUi.Success -> {
+
+                                }
+                            }
+
+                        }
+                        PullRefreshIndicator(
+                            refreshing = reFreshStateUi is StateUi.Loader,
+                            state = pullRefreshState,
+                            modifier = Modifier.align(
+                                Alignment.TopCenter
+                            )
+                        )
+                    }
+
                 } else {
                     Box(
                         modifier = Modifier
                             .fillMaxSize(0.5f),
                         contentAlignment = Alignment.Center
                     ) {
+
+
                         Text(
                             text = "Нет результатов",
                             style = MaterialTheme.typography.titleMedium,
@@ -169,6 +233,18 @@ fun Content(viewModelHome: ViewModelHome) {
                                 viewModelHome.avtoLoadAnime()
                             }
                         }
+                }
+
+            }
+
+            is StateUi.Loader -> {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxSize(0.5f)
+                            .align(Alignment.Center),
+                        strokeWidth = 6.dp
+                    )
                 }
 
             }
@@ -227,14 +303,14 @@ private fun Items(data: AnimeDetails, viewModelHome: ViewModelHome) {
         ) {
             val title = nameModels.ru!!
 
-            val part = if (nameModels.part != null){
+            val part = if (nameModels.part != null) {
                 ("Часть " + nameModels.part) ?: ""
-            }else{
+            } else {
                 ""
             }
-            val season = if (nameModels.season != null){
-                (" " + nameModels.season) ?: ""
-            }else{
+            val season = if (nameModels.season != null && nameModels.season != "1") {
+                (" " + nameModels.season + " Сезон ") ?: ""
+            } else {
                 ""
             }
 

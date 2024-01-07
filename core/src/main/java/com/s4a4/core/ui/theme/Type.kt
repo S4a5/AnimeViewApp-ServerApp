@@ -46,6 +46,11 @@ fun typography(darkTheme: Boolean): Typography {
             fontFamily = NexaFont,
             fontWeight = FontWeight.Bold,
         ),
+        labelLarge  = TextStyle(
+            fontSize = 18.sp,
+            fontFamily = NexaFont,
+            fontWeight = FontWeight.Light,
+        ),
         labelMedium = TextStyle(
             fontSize = 16.sp,
             fontFamily = NexaFont,

@@ -1,5 +1,6 @@
 package com.s4a4.home.data.anime_vost.repository
 
+import com.s4a4.core.model.AnimeSearchResult
 import com.s4a4.core.model.StateUi
 import com.s4a4.core.model.ktor.AnimeDetails
 import kotlinx.coroutines.flow.StateFlow
@@ -9,7 +10,9 @@ interface PageAnimeRepository {
 
     val lastAnimeFlow:StateFlow<List<AnimeDetails>>
     val searchAnimeFlow:StateFlow<List<AnimeDetails>>
-    suspend fun requestNewAnime()
+    suspend fun requestNewAnime(): String?
 
-    suspend fun requestAnimeByName(query: String)
+    suspend fun requestAnimeByName(query: String): AnimeSearchResult
+
+    suspend fun refreshData()
 }

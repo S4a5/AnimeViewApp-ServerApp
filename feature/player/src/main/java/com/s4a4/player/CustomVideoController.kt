@@ -13,10 +13,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
@@ -43,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.exoplayer.ExoPlayer
@@ -174,11 +179,9 @@ fun CustomVideoController(
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                 ViewVoice(
-                    modifier = Modifier,
                     viewModelVideoPlayer,
                 )
                 ViewEpisode(
-                    modifier = Modifier,
                     viewModelVideoPlayer,
                 )
             }
@@ -201,16 +204,13 @@ fun CustomVideoController(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewVoice(
-    modifier: Modifier,
     viewModelVideoPlayer: ViewModelVideoPlayer,
 ) {
     val listVoice by viewModelVideoPlayer.listVoice.collectAsState()
     var expanded by remember { mutableStateOf(false) }
     val selectedText by viewModelVideoPlayer.selectVoice.collectAsState()
 
-    Box(
-        modifier = modifier
-    ) {
+    Box {
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {
@@ -238,11 +238,19 @@ fun ViewVoice(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(Gray_4)
+                modifier = Modifier
+                    .background(Gray_4)
+                    .wrapContentWidth()
             ) {
                 listVoice.forEach { item ->
                     DropdownMenuItem(
-                        text = { Text(text = item, color = Color.White) },
+                        text = {
+                            Text(
+                                text = item,
+                                color = Color.White,
+                                modifier = Modifier.wrapContentWidth(unbounded = true)
+                            )
+                        },
                         onClick = {
                             viewModelVideoPlayer.setSelectVoice(item)
                             expanded = false
@@ -258,7 +266,6 @@ fun ViewVoice(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewEpisode(
-    modifier: Modifier,
     viewModelVideoPlayer: ViewModelVideoPlayer,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -268,14 +275,12 @@ fun ViewEpisode(
     val currentEpisodeSeriesModel by viewModelVideoPlayer.currentEpisodeSeriesModel.collectAsState()
 
 
-    Box(
-        modifier = modifier
-    ) {
+    Column {
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {
                 expanded = !expanded
-            }
+            },
         ) {
             Row(
                 modifier = Modifier
@@ -307,11 +312,19 @@ fun ViewEpisode(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(Gray_4)
+                modifier = Modifier
+                    .background(Gray_4)
+                    .wrapContentWidth()
             ) {
                 listSeriesCurrentVoice.forEach { item ->
                     DropdownMenuItem(
-                        text = { Text(text = item.name?:"null", color = Color.White) },
+                        text = {
+                            Text(
+                                text = item.name ?: "null",
+                                color = Color.White,
+                                modifier = Modifier.wrapContentWidth(unbounded = true)
+                            )
+                        },
                         onClick = {
                             viewModelVideoPlayer.setSelectEpisode(item.id)
                             expanded = false
@@ -323,6 +336,7 @@ fun ViewEpisode(
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewDefinition(
@@ -354,7 +368,7 @@ fun ViewDefinition(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = when(currentDefinition){
+                    text = when (currentDefinition) {
                         is Definition.FHD -> "FHD"
                         is Definition.HD -> "HD"
                         is Definition.SD -> "SD"
@@ -381,29 +395,29 @@ fun ViewDefinition(
                 onDismissRequest = { expanded = false },
                 modifier = Modifier.background(Gray_4)
             ) {
-                if (fhd != null){
+                if (fhd != null) {
                     DropdownMenuItem(
                         text = { Text(text = "FHD", color = Color.White) },
                         onClick = {
-                            viewModelVideoPlayer.setSelectDefinition(Definition.FHD(fhd?:"null"))
+                            viewModelVideoPlayer.setSelectDefinition(Definition.FHD(fhd ?: "null"))
                             expanded = false
                         },
                     )
                 }
-                if (hd != null){
+                if (hd != null) {
                     DropdownMenuItem(
                         text = { Text(text = "HD", color = Color.White) },
                         onClick = {
-                            viewModelVideoPlayer.setSelectDefinition(Definition.HD(hd?:"null"))
+                            viewModelVideoPlayer.setSelectDefinition(Definition.HD(hd ?: "null"))
                             expanded = false
                         },
                     )
                 }
-                if (std != null){
+                if (std != null) {
                     DropdownMenuItem(
                         text = { Text(text = "STD", color = Color.White) },
                         onClick = {
-                            viewModelVideoPlayer.setSelectDefinition(Definition.SD(std?:"null"))
+                            viewModelVideoPlayer.setSelectDefinition(Definition.SD(std ?: "null"))
                             expanded = false
                         },
                     )

@@ -60,6 +60,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$runtimeKtxVersion")
     implementation("androidx.activity:activity-compose:$activityComposeVersion")
     implementation(platform("androidx.compose:compose-bom:$composeBomVersion"))
+    //ReFresh
+    implementation ("androidx.compose.material:material:1.4.0-beta01")
+
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -103,4 +106,6 @@ dependencies {
 
     //Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
+
+
 }

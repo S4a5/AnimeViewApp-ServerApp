@@ -17,6 +17,9 @@ class GenresModuleAdapter @Inject constructor(private val genresCacheUseCase: Ge
     override suspend fun getAnimeByGenres(list: List<String>): Response<List<AnimeDetails>> {
         return ktorService.getAnimeByGenre(list)
     }
+    override fun loadGenreData(){
+        genresCacheUseCase.loadGenreData()
+    }
 
 
 }

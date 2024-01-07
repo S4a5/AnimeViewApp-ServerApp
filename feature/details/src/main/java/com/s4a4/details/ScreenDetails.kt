@@ -1,5 +1,6 @@
 package com.s4a4.details
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -220,6 +221,9 @@ fun Body(viewModel: ViewModelDetails) {
                         loading = {},
                         contentDescription = null,
                         contentScale = ContentScale.Fit,
+                        onError = {
+                                  Log.d("qweqweqwe",it.result.throwable.message.toString())
+                        },
                         modifier = Modifier
                             .size(20.dp)
                             .clip(RoundedCornerShape(10.dp))

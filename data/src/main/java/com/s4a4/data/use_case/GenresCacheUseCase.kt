@@ -6,6 +6,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.lang.Exception
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,14 +18,17 @@ class GenresCacheUseCase @Inject constructor(private val ktorService: KtorServic
     private val _listGenreFlow = MutableStateFlow<List<String>>(emptyList())
     val listGenreFlow = _listGenreFlow.asStateFlow()
 
-    init {
+    fun loadGenreData(){
         CoroutineScope(Dispatchers.IO).launch {
-            val response = ktorService.getAllGenres()
-            if (response.isSuccessful ){
-                response.body()?.let {
-                    _listGenreFlow.emit(it)
+
+                val response = ktorService.getAllGenres()
+                if (response.isSuccessful ){
+                    response.body()?.let {
+                        _listGenreFlow.emit(it)
+                    }
                 }
-            }
+
+
         }
     }
 
