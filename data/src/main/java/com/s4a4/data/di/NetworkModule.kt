@@ -75,7 +75,7 @@ object AnimeVostModule {
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .connectTimeout(3000, TimeUnit.MILLISECONDS)
+            .connectTimeout(15, TimeUnit.SECONDS)
             .addInterceptor { LoggingInterceptor().intercept(it) }
             .build()
     }

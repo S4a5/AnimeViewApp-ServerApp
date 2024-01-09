@@ -1,6 +1,7 @@
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Build
 import android.util.Log
 import android.view.View
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.viewinterop.AndroidView
@@ -45,9 +47,9 @@ import com.s4a4.player.ViewModelVideoPlayer
 @Composable
 fun ScreenVideoPlayer(id: Int, voice: String, episode: Int) {
     val activity = LocalContext.current as Activity
-    val color = MaterialTheme.colorScheme.primary
+
     val viewModel = hiltViewModel<ViewModelVideoPlayer>()
-    LaunchedEffect(key1 = Unit){
+    LaunchedEffect(key1 = Unit) {
         viewModel.setArgument(id, voice, episode)
     }
 
@@ -57,27 +59,16 @@ fun ScreenVideoPlayer(id: Int, voice: String, episode: Int) {
 
     if (currentEpisodeUrl != null) {
         Log.d("qqqqqqqqq2", currentEpisodeUrl.toString())
-        VideoPlayer( viewModel)
+        VideoPlayer(viewModel)
     }
 
-
-    DisposableEffect(Unit) {
-        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        activity.hideSystemUI(color)
-
-        onDispose {
-            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        }
-    }
-
+    activity.hideSystemUI()
 }
 
 @SuppressLint("OpaqueUnitKey")
 @Composable
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-fun VideoPlayer( viewModel: ViewModelVideoPlayer) {
-    val listSeriesCurrentVoice by viewModel.listSeriesCurrentVoice.collectAsState()
-    val currentEpisodeSeriesModel by viewModel.currentEpisodeSeriesModel.collectAsState()
+fun VideoPlayer(viewModel: ViewModelVideoPlayer) {
     val context = LocalContext.current
     val definition by viewModel.currentDefinition.collectAsState()
     val exoPlayer = remember {
@@ -88,21 +79,23 @@ fun VideoPlayer( viewModel: ViewModelVideoPlayer) {
         }
     }
 
-    LaunchedEffect(key1 = definition){
+    LaunchedEffect(key1 = definition) {
         val defaultDataSourceFactory = DefaultDataSource.Factory(context)
         val dataSourceFactory: DataSource.Factory = DefaultDataSource.Factory(
             context,
             defaultDataSourceFactory
         )
-        exoPlayer.setMediaSource( HlsMediaSource.Factory(dataSourceFactory)
-            .createMediaSource(MediaItem.fromUri(definition?.url!!)))
+        exoPlayer.setMediaSource(
+            HlsMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(definition?.url!!))
+        )
 
-        if (definition?.url?.split(".")?.last() == "mp4"){
+        if (definition?.url?.split(".")?.last() == "mp4") {
             val progressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(MediaItem.fromUri(definition?.url!!))
 
             exoPlayer.setMediaSource(progressiveMediaSource)
-        }else{
+        } else {
             val hlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(MediaItem.fromUri(definition?.url!!))
 
@@ -146,36 +139,7 @@ fun VideoPlayer( viewModel: ViewModelVideoPlayer) {
 
 }
 
-fun Activity.hideSystemUI(color: Color) {
-//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//        window.insetsController?.let {
-//
-//            it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-//
-//            window.navigationBarColor = color.hashCode()
-//
-//            it.hide(WindowInsets.Type.systemBars())
-//        }
-//    } else {
-//        @Suppress("DEPRECATION")
-//        window.decorView.systemUiVisibility = (
-//
-//                View.SYSTEM_UI_FLAG_IMMERSIVE
-//                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                        or View.SYSTEM_UI_FLAG_FULLSCREEN
-//
-//                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
-//
-//        @Suppress("DEPRECATION")
-//        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
-//    }
-//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//        window.insetsController?.show(WindowInsets.Type.systemBars())
-//    } else {
-//        @Suppress("DEPRECATION")
-//        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
-//    }
+fun Activity.hideSystemUI() {
     WindowCompat.setDecorFitsSystemWindows(window, false)
     window.decorView.systemUiVisibility = (
             // Скрытие нижней панели навигации

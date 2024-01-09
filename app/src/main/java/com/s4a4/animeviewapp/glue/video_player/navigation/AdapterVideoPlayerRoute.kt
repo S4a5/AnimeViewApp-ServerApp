@@ -12,6 +12,7 @@ class AdapterVideoPlayerRoute @Inject constructor():NavigateVideoPlayer {
     private var navCon: NavController? = null
     fun setNavControl(navController: NavController) {
         navCon = navController
+
     }
 
     override fun screenGetOut() {
