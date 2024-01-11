@@ -26,8 +26,8 @@ fun NavGraphBuilder.routeScreenVideoPlayer(route: String) {
             navArgument(EPISODE_INDEX_IN_LIST) { type = NavType.IntType }
         )
     ) { entry ->
-        val activity = LocalContext.current as Activity
-        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+//        val activity = LocalContext.current as Activity
+//        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         val id = entry.arguments?.getInt(ANIME_ID)
         val voice = entry.arguments?.getString(VOICE)
         val episode = entry.arguments?.getInt(EPISODE_INDEX_IN_LIST)

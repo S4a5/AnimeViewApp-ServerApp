@@ -1,6 +1,8 @@
 package com.s4a4.home
 
 
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -67,6 +69,11 @@ import kotlinx.coroutines.launch
 fun ScreenHome(
     viewModelHome: ViewModelHome = hiltViewModel()
 ) {
+    val activity = LocalContext.current as Activity
+
+    LaunchedEffect(Unit) {
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
 
     Column(
         modifier = Modifier
@@ -177,6 +184,7 @@ fun Content(viewModelHome: ViewModelHome) {
                                     }
 
                                 }
+
                                 StateUi.Loader -> {
                                     item {
 

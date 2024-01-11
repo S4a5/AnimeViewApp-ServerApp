@@ -52,7 +52,7 @@ fun AnimeViewAppTheme(
     content: @Composable () -> Unit
 ) {
 
-    val colors = if (darkTheme) DarkColorScheme else LightColorScheme
+    val colors = if (false) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colors,

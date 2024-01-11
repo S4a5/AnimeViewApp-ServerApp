@@ -77,7 +77,7 @@ class MainActivity @Inject constructor() : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        AvtoOrnamentation(navController)
+//                        AvtoOrnamentation(navController)
                         BottomNavigation(
                             navController = navController,
                             list = listOf(RouteScreen.SignHome)

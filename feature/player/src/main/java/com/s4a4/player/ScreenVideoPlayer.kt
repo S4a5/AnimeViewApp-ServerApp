@@ -8,6 +8,7 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,19 +51,26 @@ fun ScreenVideoPlayer(id: Int, voice: String, episode: Int) {
 
     val viewModel = hiltViewModel<ViewModelVideoPlayer>()
     LaunchedEffect(key1 = Unit) {
+        activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        activity.hideSystemUI()
         viewModel.setArgument(id, voice, episode)
     }
-
+    BackHandler {
+        viewModel.onBack().let {
+            activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            activity.showSystemUI()
+        }
+    }
 
     val currentEpisodeUrl by viewModel.currentEpisodeSeriesModel.collectAsState()
 
 
     if (currentEpisodeUrl != null) {
-        Log.d("qqqqqqqqq2", currentEpisodeUrl.toString())
         VideoPlayer(viewModel)
     }
-
-    activity.hideSystemUI()
 }
 
 @SuppressLint("OpaqueUnitKey")
@@ -143,10 +151,16 @@ fun Activity.hideSystemUI() {
     WindowCompat.setDecorFitsSystemWindows(window, false)
     window.decorView.systemUiVisibility = (
             // Скрытие нижней панели навигации
-            android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     // Скрытие статус-бара
-                    or android.view.View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
                     // Возможность использования жестового навигационного жеста
-                    or android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
             )
+}
+
+fun Activity.showSystemUI() {
+    WindowCompat.setDecorFitsSystemWindows(window, true)
+    window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
 }

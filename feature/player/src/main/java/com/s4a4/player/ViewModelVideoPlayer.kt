@@ -7,6 +7,7 @@ import com.s4a4.core.model.ktor.AnimeDetails
 import com.s4a4.core.model.ktor.SeriesModel
 import com.s4a4.player.data.GetAnimeByIdRepository
 import com.s4a4.player.data.model.Definition
+import com.s4a4.player.navigate.NavigateVideoPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class ViewModelVideoPlayer @Inject constructor(private val getAnimeByIdRepository: GetAnimeByIdRepository) :
+class ViewModelVideoPlayer @Inject constructor(private val getAnimeByIdRepository: GetAnimeByIdRepository,private val navigateVideoPlayer: NavigateVideoPlayer) :
     ViewModel() {
 
     private val _animeId = MutableStateFlow<Int?>(null)
@@ -27,9 +28,6 @@ class ViewModelVideoPlayer @Inject constructor(private val getAnimeByIdRepositor
 
     private val _selectEpisodeId = MutableStateFlow<Int?>(null)
     val selectEpisodeId = _selectEpisodeId.asStateFlow()
-
-//    private val _episodesCurrentVoice = MutableStateFlow<Map<Int,String>>(emptyMap())
-//    val episodesCurrentVoice = _episodesCurrentVoice.asStateFlow()
 
     private val _animeDetails = MutableStateFlow<AnimeDetails?>(null)
     val animeDetails = _animeDetails.asStateFlow()
@@ -66,13 +64,7 @@ class ViewModelVideoPlayer @Inject constructor(private val getAnimeByIdRepositor
 
                     val listSeriesCurrentVoice = animeDetails.seriesModels[index]
                     _listSeriesCurrentVoice.emit(listSeriesCurrentVoice)
-//                    val a = listSeriesCurrentVoice.mapIndexed { index, seriesModel ->
-//                        index to (seriesModel.name?:"null")
-//                    }.toMap()
-//
-//                    _episodesCurrentVoice.emit(a)
                     val a = listSeriesCurrentVoice.find {
-                        Log.d("qqqqqqqqqq26", it.id.toString())
                         it.id == selectEpisodeId
                     }
                     a?.let{
@@ -86,18 +78,12 @@ class ViewModelVideoPlayer @Inject constructor(private val getAnimeByIdRepositor
                         )
 
                     }
-                    Log.d("qqqqqqqqqq25", selectEpisodeId.toString())
-                    Log.d("qqqqqqqqqq25", a.toString())
 
                     setAutoDefinition()
                     return@forEachIndexed
                 }
 
 
-            }
-            if (animeDetails != null) {
-                Log.d("qqqqqqqqq24", _listVoice.value.size.toString())
-                Log.d("qqqqqqqqq24", _listSeriesCurrentVoice.value.size.toString())
             }
         }.launchIn(viewModelScope)
     }
@@ -114,10 +100,6 @@ class ViewModelVideoPlayer @Inject constructor(private val getAnimeByIdRepositor
             val fhd = currentEpisodeSeriesModel.value?.fhd
             val hd = currentEpisodeSeriesModel.value?.hd
             val std = currentEpisodeSeriesModel.value?.std
-        Log.d("qqqqqqqqqqq25",fhd.toString())
-        Log.d("qqqqqqqqqqq25",hd.toString())
-        Log.d("qqqqqqqqqqq25",std.toString())
-        Log.d("qqqqqqqqqqq25","------")
 
             if (fhd != null) {
                 _currentDefinition.value = Definition.FHD(fhd)
@@ -142,5 +124,8 @@ class ViewModelVideoPlayer @Inject constructor(private val getAnimeByIdRepositor
 
     fun setSelectDefinition(definition: Definition) {
         _currentDefinition.value = definition
+    }
+    fun onBack(){
+        navigateVideoPlayer.screenGetOut()
     }
 }
