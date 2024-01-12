@@ -101,8 +101,9 @@ fun Content(viewModelHome: ViewModelHome) {
         val reFreshStateUi by viewModelHome.reFreshStateUi.collectAsState()
         val listAnime by viewModelHome.viewList.collectAsState()
         val progress by viewModelHome.progressNewAnime.collectAsState()
+        val stateUiSearch by viewModelHome.stateUiSearch.collectAsState()
 
-        when (val state = stateUi) {
+        when (stateUi) {
             is StateUi.Failed -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -237,7 +238,7 @@ fun Content(viewModelHome: ViewModelHome) {
                             Log.d("qweqwrqwrq", lazyState.firstVisibleItemIndex.toString())
                             val lastVisibleItem =
                                 lazyState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-                            if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2) {
+                            if (lastVisibleItem >= lazyState.layoutInfo.totalItemsCount - 2 && stateUiSearch is StateUi.Success) {
                                 viewModelHome.avtoLoadAnime()
                             }
                         }
